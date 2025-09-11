@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <template>
   <div class="app">
     <div v-if="!isLoginPage" class="main-layout">
@@ -61,3 +62,16 @@ body {
   }
 }
 </style>
+=======
+<script setup></script>
+
+<template>
+  <h1 class="text-4xl text-red-400">You did it!</h1>
+  <p>
+    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
+    documentatiBAGVon
+  </p>
+</template>
+
+<style scoped></style>
+>>>>>>> f04999ac88457181540a72bfe2d07f0caab1b97b

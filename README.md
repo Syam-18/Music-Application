@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # music-app
+=======
+# Music App
+>>>>>>> f04999ac88457181540a72bfe2d07f0caab1b97b
 
 This template should help get you started developing with Vue 3 in Vite.
 

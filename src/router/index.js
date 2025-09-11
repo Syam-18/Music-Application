@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-<<<<<<< HEAD
 import Home from '../views/Home.vue'
 import Search from '../views/Search.vue'
 import Library from '../views/Library.vue'
@@ -55,12 +54,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-=======
-
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [],
->>>>>>> f04999ac88457181540a72bfe2d07f0caab1b97b
 })
 
 export default router

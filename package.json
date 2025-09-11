@@ -10,15 +10,6 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-<<<<<<< HEAD
-    "lint:oxlint": "oxlint . --fix -D correctness --ignore-path .gitignore",
-    "lint:eslint": "eslint . --fix",
-    "lint": "run-s lint:*",
-    "format": "prettier --write src/"
-  },
-  "dependencies": {
-    "pinia": "^3.0.3",
-=======
     "lint": "eslint . --fix",
     "format": "prettier --write src/"
   },
@@ -26,28 +17,11 @@
     "@tailwindcss/vite": "^4.1.13",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.13",
->>>>>>> f04999ac88457181540a72bfe2d07f0caab1b97b
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
-<<<<<<< HEAD
-    "@prettier/plugin-oxc": "^0.0.4",
-    "@vitejs/plugin-vue": "^6.0.1",
-    "@vue/eslint-config-prettier": "^10.2.0",
-    "eslint": "^9.31.0",
-    "eslint-plugin-oxlint": "~1.8.0",
-    "eslint-plugin-vue": "~10.3.0",
-    "globals": "^16.3.0",
-    "npm-run-all2": "^8.0.4",
-    "oxlint": "~1.8.0",
-    "prettier": "3.6.2",
-    "vite": "npm:rolldown-vite@latest",
-    "vite-plugin-vue-devtools": "^8.0.0"
-  }
-}
-=======
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "eslint": "^9.31.0",
@@ -58,4 +32,3 @@
     "vite-plugin-vue-devtools": "^8.0.0"
   }
 }
->>>>>>> f04999ac88457181540a72bfe2d07f0caab1b97b

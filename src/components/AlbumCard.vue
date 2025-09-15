@@ -1,53 +1,62 @@
 <template>
-  <div class="artist-card shrink-0" @click="playArtist">
-    <div class="card-image">
-      <img :src="artist.image" :alt="artist.name" class="rounded-full" />
-      <div class="play-button z-10">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path
-            d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z" />
-        </svg>
+  <router-link :to="`/album/${album.id}`">
+    <div class="album-card w-[180px] shrink-0 h-[100%]" @click="playAlbum">
+      <div class="card-image">
+        <img :src="album.images[0]?.url" :alt="album.name" />
+        <div class="play-button" :class="{ show: showPlayButton }">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z" />
+          </svg>
+        </div>
+      </div>
+      <div class="card-content">
+        <h3 class="card-title text-md tracking-wider truncate">{{ album.name }}</h3>
+        <div class="flex truncate">
+          <p class="card-description tracking-wider" v-for="artist in album.artists">
+          {{ artist.name}}, 
+        </p>
+        </div>
       </div>
     </div>
-    <div class="card-content">
-      <h3 class="card-title tracking-wider">{{ artist.name }}</h3>
-      <p class="card-type tracking-wider">Artist</p>
-    </div>
-  </div>
+  </router-link>
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { store } from '@/stores'
 
 const router = useRouter()
 
 const props = defineProps({
-  artist: {
+  album: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
 
+const showPlayButton = ref(false)
 
-const playArtist = () => {
-  router.push(`/artist/${props.artist.id}`)
+const playAlbum = () => {
+  store.playSong(props.album)
 }
 </script>
 
 <style scoped>
-.artist-card {
-  width: 160px;
+.album-card {
+  width: 180px;
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.artist-card:hover {
+.album-card:hover {
   background: #1f1f1f;
 }
 
-.artist-card:hover .play-button {
+.album-card:hover .play-button {
   opacity: 1;
   transform: translateY(0);
 }

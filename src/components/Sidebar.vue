@@ -1,15 +1,15 @@
 <template>
   <div class="sidebar">
     <div class="sidebar-header">
-      <div class="library-section">
-        <div class="library-title">
+      <div class="flex items-center justify-center">
+        <div class="flex items-center gap-3 text-[#b3b3b3] font-[700]">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path
               d="M3 22a1 1 0 01-1-1V3a1 1 0 011-1h3v20H3zM7 2a1 1 0 011-1h12a1 1 0 011 1v20a1 1 0 01-1 1H8a1 1 0 01-1-1V2zm2 2v16h10V4H9z" />
           </svg>
           <span>My Library</span>
         </div>
-        <button class="create-btn">+</button>
+        <button class="w-8 h-8 rounded-full bg-transparent border-none text-[#b3b3b3] text-[20px] cursor-pointer flex items-center justify-center transition duration-200 hover:bg-[#1a1a1a] hover:text-white">+</button>
       </div>
     </div>
 
@@ -105,40 +105,11 @@
   margin-bottom: 32px;
 }
 
-.library-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
-.library-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #b3b3b3;
-  font-size: 16px;
-  font-weight: 700;
-}
 
-.create-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  color: #b3b3b3;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
 
-.create-btn:hover {
-  background: #1a1a1a;
-  color: #fff;
-}
+
+
 
 .sidebar-nav {
   display: flex;

@@ -3,10 +3,13 @@ import Home from '../views/Home.vue'
 import Search from '../views/Search.vue'
 import Library from '../views/Library.vue'
 import LikedSongs from '../views/LikedSongs.vue'
-import Album from '../views/Album.vue'
-import Artist from '../views/Artist.vue'
+// import Artist from '../views/Artist.vue'
 import Playlist from '../views/Playlist.vue'
 import Login from '../views/Login.vue'
+import { useAuthStore } from '@/stores/auth'
+import TrackView from '@/components/TrackView.vue'
+import ArtistView from '@/components/ArtistView.vue'
+import SearchResults from '@/components/SearchResults.vue'
 
 const routes = [
   {
@@ -20,6 +23,11 @@ const routes = [
     component: Search,
   },
   {
+    path: '/search/:id',
+    name: 'SearchResults',
+    component: SearchResults,
+  },
+  {
     path: '/library',
     name: 'Library',
     component: Library,
@@ -28,16 +36,6 @@ const routes = [
     path: '/liked-songs',
     name: 'LikedSongs',
     component: LikedSongs,
-  },
-  {
-    path: '/album/:id',
-    name: 'Album',
-    component: Album,
-  },
-  {
-    path: '/artist/:id',
-    name: 'Artist',
-    component: Artist,
   },
   {
     path: '/playlist/:id',
@@ -49,11 +47,33 @@ const routes = [
     name: 'Login',
     component: Login,
   },
+  {
+    path: '/track/:id',
+    name: 'TrackView',
+    component: TrackView,
+  },
+  {
+    path: '/artist/:id',
+    name: 'ArtistView',
+    component: ArtistView,
+  },
+  {
+    path: '/album/:id',
+    name: 'AlbumView',
+    component: () => import('@/components/AlbumView.vue'),
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 })
+
+// router.beforeEach((to, from, next) => {
+//   const authStore = useAuthStore()
+//   if (to.path === '/home' && !authStore.user) next('/')
+//   else if (to.path === '/' && authStore.user) next('/home')
+//   else next()
+// })
 
 export default router

@@ -1,8 +1,9 @@
 <template>
-  <div class="artist-card shrink-0" @click="playArtist">
+  <router-link :to="`/track/${playlist.id}`" >
+  <div class="playlist-card w-[180px] shrink-0" @click="playPlaylist">
     <div class="card-image">
-      <img :src="artist.image" :alt="artist.name" class="rounded-full" />
-      <div class="play-button z-10">
+      <img :src="album.images[0].url" :alt="playlist.name" />
+      <div class="play-button" :class="{ show: showPlayButton }">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path
             d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z" />
@@ -10,44 +11,60 @@
       </div>
     </div>
     <div class="card-content">
-      <h3 class="card-title tracking-wider">{{ artist.name }}</h3>
-      <p class="card-type tracking-wider">Artist</p>
+      <h3 class="card-title text-md tracking-wider">{{ playlist.name }}</h3>
+      <p class="card-description tracking-wider">{{ playlist.artists[0].name }}</p>
     </div>
   </div>
+</router-link>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { store } from '@/stores'
 
 const router = useRouter()
 
 const props = defineProps({
-  artist: {
+  playlist: {
     type: Object,
-    required: true
-  }
+    required: true,
+  },
 })
+const { album } = props.playlist
 
+const showPlayButton = ref(false)
 
-const playArtist = () => {
-  router.push(`/artist/${props.artist.id}`)
+const truncate = (text, length) => {
+  if (!text) return ''
+  return text.length > length ? text.slice(0, length) + '...' : text
+}
+
+const playPlaylist = () => {
+  // Navigate to playlist/album page or play directly
+  if (props.playlist.id <= 8) {
+    router.push(`/playlist/${props.playlist.id}`)
+  } else {
+    store.playSong(props.playlist)
+  }
 }
 </script>
 
 <style scoped>
-.artist-card {
-  width: 160px;
+.playlist-card {
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.artist-card:hover {
+.playlist-card:hover {
   background: #1f1f1f;
 }
 
-.artist-card:hover .play-button {
+.playlist-card:hover .play-button {
   opacity: 1;
   transform: translateY(0);
 }
@@ -56,8 +73,9 @@ const playArtist = () => {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  margin-bottom: 16px;
-  border-radius: 50%;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
@@ -69,8 +87,8 @@ const playArtist = () => {
 
 .play-button {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
+  bottom: 8px;
+  right: 8px;
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -94,15 +112,20 @@ const playArtist = () => {
 }
 
 .card-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 4px;
   line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.card-type {
+.card-description {
   font-size: 14px;
   color: #b3b3b3;
   line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

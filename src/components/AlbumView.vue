@@ -2,8 +2,6 @@
   <div class="spotify-page">
     <!-- Blurred Background -->
     <div
-      class="blur-bg"
-      :style="{ backgroundImage: `url(${album?.images?.[0]?.url || fallbackImage})` }"
 
     ></div>
 
@@ -21,7 +19,6 @@
               {{ tracks.length }} songs • {{ totalDuration }}
             </p>
           </div>
-          <button class="search-btn">🔍</button>
         </div>
 
         <!-- Controls -->
@@ -34,23 +31,19 @@
 
         <!-- Track List -->
         <div class="track-list">
-          <div class="track-header">
-            <span class="track-number">#</span>
-            <span class="track-title">Title</span>
-            <span class="track-duration">Duration</span>
-          </div>
 
           <div v-if="loadingAlbum" class="loading">Loading...</div>
           <div v-else>
             <div
               v-for="(track, index) in tracks.slice(0, 10)"
               :key="track.id"
-              class="track-row"
+              class="track-row relative"
             >
+            <router-link :to="`/track/${track.id}`" class="absolute inset-0"></router-link>
               <span class="track-number">{{ index + 1 }}</span>
               <div class="track-info">
                 <p class="track-name">{{ track.name }}</p>
-                <p class="track-artists">{{ getArtistNames(track.artists) }}</p>
+                <p class="track-artists">{{ getArtistNames(track.artists) }} </p>
               </div>
               <div class="track-actions">
                 <span
@@ -94,7 +87,8 @@
             <li
               v-for="artist in featuredArtists"
               :key="artist.id"
-              class="artist-row"
+              class="artist-row hover:underline cursor-pointer"
+              @click="router.push(`/artist/${artist.id}`)"
             >
               <div class="artist-avatar">
                 <img :src="artist.images?.[0]?.url || fallbackImage" alt="Artist" />
@@ -111,7 +105,7 @@
 <script setup>
 defineOptions({ name: "AlbumPage" })
 import { ref, onMounted, computed } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 
 const album = ref(null)
 const tracks = ref([])
@@ -120,6 +114,7 @@ const likedTracks = ref([])
 const featuredArtists = ref([])
 const fallbackImage = "https://via.placeholder.com/300x300?text=No+Image"
 const Route = useRoute()
+const router = useRouter()
 
 const formatDuration = (ms) => {
   const minutes = Math.floor(ms / 60000)
@@ -141,7 +136,6 @@ const fetchArtistDetails = async (ids, token) => {
 
 const CLIENT_ID = "138c665e559f48ecb1bfe23378edfff9"
 const CLIENT_SECRET = "193754eb82e0496ab5236eec396c12b5"
-const ALBUM_ID = "4m2880jivSbbyEGAKfITCa" // Random Access Memories
 
 const getAccessToken = async () => {
   const url = "https://accounts.spotify.com/api/token"
@@ -179,6 +173,7 @@ const fetchAlbumData = async () => {
   } finally {
     loadingAlbum.value = false
   }
+  console.log(album.value)
 }
 
 const totalDuration = computed(() => {
@@ -306,13 +301,13 @@ onMounted(() => {
 .track-row {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 10px 5px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
 }
 .track-row:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: hsl(0, 0%, 20%);
 }
 .track-number {
   width: 32px;

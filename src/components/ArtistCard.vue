@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="card-content">
-      <h3 class="card-title tracking-wider">{{ artist.name }}</h3>
+      <h3 class="card-title tracking-wider hover:underline" @click.stop="router.push(`/artist/${artist.id}`)">{{ artist.name }}</h3>
       <p class="card-type tracking-wider">Artist</p>
     </div>
   </div>

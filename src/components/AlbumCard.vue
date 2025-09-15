@@ -1,6 +1,5 @@
 <template>
-  <router-link :to="`/album/${album.id}`">
-    <div class="album-card w-[180px] shrink-0 h-[100%]" @click="playAlbum">
+    <div class="album-card w-[180px] shrink-0 h-[100%]" @click="router.push(`/album/${album.id}`)">
       <div class="card-image">
         <img :src="album.images[0]?.url" :alt="album.name" />
         <div class="play-button" :class="{ show: showPlayButton }">
@@ -12,14 +11,13 @@
       </div>
       <div class="card-content">
         <h3 class="card-title text-md tracking-wider truncate">{{ album.name }}</h3>
-        <div class="flex truncate">
-          <p class="card-description tracking-wider" v-for="artist in album.artists">
-          {{ artist.name}}, 
+        <div class="flex truncate gap-2" >
+          <p class="card-description tracking-wider hover:underline" v-for="artist in album.artists" @click.stop="router.push(`/artist/${artist.id}`)">
+          {{ artist.name}}
         </p>
         </div>
       </div>
     </div>
-  </router-link>
 </template>
 
 <script setup>

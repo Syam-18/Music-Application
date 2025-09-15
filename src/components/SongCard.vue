@@ -1,6 +1,5 @@
 <template>
-  <router-link :to="`/track/${playlist.id}`" >
-  <div class="playlist-card w-[180px] shrink-0" @click="playPlaylist">
+  <div class="playlist-card w-[180px] shrink-0" @click="router.push(`/track/${playlist.id}`)">
     <div class="card-image">
       <img :src="album.images[0].url" :alt="playlist.name" />
       <div class="play-button" :class="{ show: showPlayButton }">
@@ -11,11 +10,10 @@
       </div>
     </div>
     <div class="card-content">
-      <h3 class="card-title text-md tracking-wider">{{ playlist.name }}</h3>
-      <p class="card-description tracking-wider">{{ playlist.artists[0].name }}</p>
+      <h3 class="card-title text-md tracking-wider hover:underline">{{ playlist.name }}</h3>
+      <p class="card-description tracking-wider hover:underline" @click.stop="router.push(`/artist/${playlist.artists[0].id}`)">{{ playlist.artists[0].name }}</p>
     </div>
   </div>
-</router-link>
 </template>
 
 <script setup>
@@ -31,14 +29,12 @@ const props = defineProps({
     required: true,
   },
 })
+
+console.log(props.playlist)
 const { album } = props.playlist
 
 const showPlayButton = ref(false)
 
-const truncate = (text, length) => {
-  if (!text) return ''
-  return text.length > length ? text.slice(0, length) + '...' : text
-}
 
 const playPlaylist = () => {
   // Navigate to playlist/album page or play directly

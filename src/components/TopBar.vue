@@ -1,14 +1,14 @@
 <template>
   <div class="topbar">
     <div class="nav-buttons">
-      <button class="nav-btn">
+      <button class="nav-btn" @click="$router.go(-1)">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path
             d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
           />
         </svg>
       </button>
-      <button class="nav-btn disabled">
+      <button class="nav-btn" @click="$router.go(+1)">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path
             d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8l-6.47 6.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"
@@ -126,7 +126,8 @@ watch(
       searchQuery.value = newId || ''
       getTracks(newId)
     }
-  }, { immediate: true }
+  },
+  { immediate: true },
 )
 
 onMounted(() => {
@@ -139,8 +140,7 @@ onMounted(() => {
 const changeSearchPath = () => {
   if (route.name === 'SearchResults') {
     router.push(`/search/${router.params.id}`)
-  }
-  else {
+  } else {
     router.push('/search')
   }
 }

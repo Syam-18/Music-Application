@@ -30,7 +30,7 @@ const getAccessToken = async () => {
   return data.access_token
 }
 const getArtistNames = (artists) => {
-  artists?.map((a) => a.name).join(', ') || 'Unknown'
+  return artists?.map((a) => a.name).join(', ') || 'Unknown'
 }
 const formatDuration = (ms) => {
   const minutes = Math.floor(ms / 60000)
@@ -71,6 +71,7 @@ const getArtistTopTracks = async (id, market = 'US') => {
   const data = await res.json()
   topTracks.value = data.tracks // Spotify returns { tracks: [...] }
   // console.log('Artist top tracks:', data.tracks) // 🔥 Array of track objects
+  console.log(topTracks.value)
   return data.tracks
 }
 
@@ -134,7 +135,7 @@ getArtistAlbums()
         </RouterLink>
       </div>
     </div>
-    
+
   </div>
   <section class="mt-4">
     <h2 class="font-semibold text-2xl mb-2">Popular Albums</h2>

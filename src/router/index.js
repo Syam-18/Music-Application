@@ -2,8 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Search from '../views/Search.vue'
 import LikedSongs from '../views/LikedSongs.vue'
-// import Artist from '../views/Artist.vue'
-import Playlist from '../views/Playlist.vue'
 import Login from '../views/Login.vue'
 // import { useAuthStore } from '@/stores/auth'
 import TrackView from '@/components/TrackView.vue'
@@ -30,11 +28,6 @@ const routes = [
     path: '/liked-songs',
     name: 'LikedSongs',
     component: LikedSongs,
-  },
-  {
-    path: '/playlist/:id',
-    name: 'Playlist',
-    component: Playlist,
   },
   {
     path: '/login',

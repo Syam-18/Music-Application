@@ -1,12 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Search from '../views/Search.vue'
-import Library from '../views/Library.vue'
 import LikedSongs from '../views/LikedSongs.vue'
 // import Artist from '../views/Artist.vue'
 import Playlist from '../views/Playlist.vue'
 import Login from '../views/Login.vue'
-import { useAuthStore } from '@/stores/auth'
+// import { useAuthStore } from '@/stores/auth'
 import TrackView from '@/components/TrackView.vue'
 import ArtistView from '@/components/ArtistView.vue'
 import SearchResults from '@/components/SearchResults.vue'
@@ -26,11 +25,6 @@ const routes = [
     path: '/search/:id',
     name: 'SearchResults',
     component: SearchResults,
-  },
-  {
-    path: '/library',
-    name: 'Library',
-    component: Library,
   },
   {
     path: '/liked-songs',
@@ -71,8 +65,8 @@ const router = createRouter({
 
 // router.beforeEach((to, from, next) => {
 //   const authStore = useAuthStore()
-//   if (to.path === '/home' && !authStore.user) next('/')
-//   else if (to.path === '/' && authStore.user) next('/home')
+//   if (to.path === '/' && !authStore.user) next('/')
+//   else if (to.path === '/' && authStore.user) next('/')
 //   else next()
 // })
 

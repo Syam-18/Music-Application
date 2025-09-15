@@ -83,11 +83,11 @@ const handleSubmit = async () => {
   try {
     if (mode.value === 'login') {
       await authStore.login(email.value, password.value)
-      router.replace('/home')
+      router.replace('/')
     } else {
       await authStore.signup(email.value, password.value, name.value)
       await authStore.login(email.value, password.value)
-      router.replace('/home')
+      router.replace('/')
     }
   } catch (err) {
     // 🔹 Catch login/signup errors
@@ -110,7 +110,7 @@ const handleSubmit = async () => {
 const handleGoogleLogin = async () => {
   try {
     await authStore.loginWithGoogle()
-    router.replace('/home')
+    router.replace('/')
   } catch (err) {
     if (err.code === 'auth/popup-closed-by-user') alert('Login popup closed by user.')
     else alert(err.message)

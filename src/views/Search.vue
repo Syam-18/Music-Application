@@ -1,58 +1,56 @@
 <template>
   <div class="search-container">
-    <div class="search-header">
-      <div class="search-input-container">
-        <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M10.68 11.74a6 6 0 01-7.922-8.982 6 6 0 018.982 7.922l3.04 3.04a.749.749 0 01-.326 1.275.749.749 0 01-.734-.215L10.68 11.74zm-2.49-8.993a4.5 4.5 0 00-6.37 6.37 4.5 4.5 0 006.37-6.37z" />
-        </svg>
-        <input v-model="searchQuery" type="text" placeholder="What do you want to play?" @input="handleSearch" />
-      </div>
-    </div>
-
     <div class="search-content">
       <div v-if="!searchQuery" class="search-home">
-        <section class="recent-searches" v-if="recentSearches.length">
-          <h2>Recent searches</h2>
-          <div class="recent-items">
-            <div v-for="item in recentSearches" :key="item.id" class="recent-item" @click="selectRecentSearch(item)">
-              <img :src="item.image" :alt="item.name" />
-              <span>{{ item.name }}</span>
-              <button class="remove-btn" @click.stop="removeRecentSearch(item.id)">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                  <path
-                    d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </section>
-
         <section class="browse-all">
           <h2>Browse all</h2>
           <div class="browse-grid">
-            <div class="browse-category" style="background: linear-gradient(135deg, #8400e7 0%, #44107a 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #8400e7 0%, #44107a 100%)"
+            >
               <span>Made For You</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #e1118c 0%, #f73570 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #e1118c 0%, #f73570 100%)"
+            >
               <span>New Releases</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #1e3264 0%, #0d47a1 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #1e3264 0%, #0d47a1 100%)"
+            >
               <span>Spotify Classics</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #8d67ab 0%, #9a208c 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #8d67ab 0%, #9a208c 100%)"
+            >
               <span>Charts</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #e91429 0%, #dc148c 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #e91429 0%, #dc148c 100%)"
+            >
               <span>Trending</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #27856a 0%, #1db954 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #27856a 0%, #1db954 100%)"
+            >
               <span>Discover</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #777777 0%, #333333 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #777777 0%, #333333 100%)"
+            >
               <span>Spotify Singles</span>
             </div>
-            <div class="browse-category" style="background: linear-gradient(135deg, #bc5900 0%, #8e44ad 100%)">
+            <div
+              class="browse-category"
+              style="background: linear-gradient(135deg, #bc5900 0%, #8e44ad 100%)"
+            >
               <span>Decades</span>
             </div>
           </div>
@@ -61,65 +59,56 @@
         <section class="genres">
           <h2>Genres</h2>
           <div class="genres-grid">
-            <div class="genre-card" style="background: linear-gradient(135deg, #148a08 0%, #b49bc8 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #148a08 0%, #b49bc8 100%)"
+            >
               <span>Pop</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #ba5d07 0%, #6d1919 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #ba5d07 0%, #6d1919 100%)"
+            >
               <span>Country</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #8d67ab 0%, #ba5d07 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #8d67ab 0%, #ba5d07 100%)"
+            >
               <span>Hip-Hop</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #477d95 0%, #0c73b8 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #477d95 0%, #0c73b8 100%)"
+            >
               <span>Rock</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #e13300 0%, #f59b00 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #e13300 0%, #f59b00 100%)"
+            >
               <span>Indie</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #8400e7 0%, #44107a 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #8400e7 0%, #44107a 100%)"
+            >
               <span>Punk</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #e91429 0%, #dc148c 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #e91429 0%, #dc148c 100%)"
+            >
               <span>Metal</span>
             </div>
-            <div class="genre-card" style="background: linear-gradient(135deg, #477d95 0%, #0c73b8 100%)">
+            <div
+              class="genre-card"
+              style="background: linear-gradient(135deg, #477d95 0%, #0c73b8 100%)"
+            >
               <span>Instrumental</span>
             </div>
           </div>
         </section>
-      </div>
-
-      <div v-else class="search-results">
-        <div v-if="searchResults.length === 0" class="no-results">
-          <p>No results found for "{{ searchQuery }}"</p>
-        </div>
-        <div v-else>
-          <section v-if="searchResults.songs?.length" class="results-section">
-            <h3>Songs</h3>
-            <div class="songs-list">
-              <div v-for="song in searchResults.songs" :key="song.id" class="song-item" @click="playSong(song)">
-                <img :src="song.image" :alt="song.title" />
-                <div class="song-info">
-                  <span class="song-title">{{ song.title }}</span>
-                  <span class="song-artist">{{ song.artist }}</span>
-                </div>
-                <span class="song-duration">{{ song.duration }}</span>
-              </div>
-            </div>
-          </section>
-
-          <section v-if="searchResults.artists?.length" class="results-section">
-            <h3>Artists</h3>
-            <div class="artists-grid">
-              <div v-for="artist in searchResults.artists" :key="artist.id" class="artist-item"
-                @click="goToArtist(artist.id)">
-                <img :src="artist.image" :alt="artist.name" />
-                <span>{{ artist.name }}</span>
-                <small>Artist</small>
-              </div>
-            </div>
-          </section>
-        </div>
       </div>
     </div>
   </div>
@@ -129,54 +118,18 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { store } from '@/stores'
+import SearchResults from '@/components/SearchResults.vue'
 
 const router = useRouter()
 const searchQuery = ref('')
 const searchResults = ref({})
 
+
 const recentSearches = computed(() => store.recentSearches)
 
-const handleSearch = () => {
-  if (!searchQuery.value.trim()) {
-    searchResults.value = {}
-    return
-  }
-
-  // Mock search results
-  searchResults.value = {
-    songs: [
-      {
-        id: 1,
-        title: 'Get Lucky',
-        artist: 'Daft Punk',
-        duration: '4:35',
-        image: 'https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=2'
-      },
-      {
-        id: 2,
-        title: 'Instant Crush',
-        artist: 'Daft Punk',
-        duration: '5:37',
-        image: 'https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg?auto=compress&cs=tinysrgb&w=64&h=64&dpr=2'
-      }
-    ],
-    artists: [
-      {
-        id: 1,
-        name: 'Daft Punk',
-        image: 'https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&dpr=2'
-      }
-    ]
-  }
-}
-
-const selectRecentSearch = (item) => {
-  searchQuery.value = item.name
-  handleSearch()
-}
 
 const removeRecentSearch = (id) => {
-  const index = store.recentSearches.findIndex(item => item.id === id)
+  const index = store.recentSearches.findIndex((item) => item.id === id)
   if (index > -1) {
     store.recentSearches.splice(index, 1)
   }

@@ -1,29 +1,53 @@
 // services/userService.js
-import { doc, setDoc } from 'firebase/firestore'
-import { db } from '@/firebase'
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/firebase";
 
 /**
- * Saves or updates the authenticated user's profile in Firestore.
- * @param user - Firebase Auth user object
+ * Save or update the user's profile in Firestore.
+ * Will create the document if it doesn't exist yet.
  */
-export async function saveUserProfile(user) {
-  if (!user?.uid) return
+export const saveUserProfile = async (user) => {
+  if (!user) return;
 
-  try {
-    const userRef = doc(db, 'users', user.uid)
+  const userRef = doc(db, "users", user.uid);
 
-    const data = {
-      name: user.displayName || '',
-      email: user.email || '',
-      photoURL: user.photoURL || '',
-      lastLogin: new Date(),
-    }
+  const userData = {
+    uid: user.uid,
+    email: user.email || null,
+    displayName: user.displayName || null,
+    photoURL: user.photoURL || null,
+    createdAt: serverTimestamp(), // ⬅ better than new Date()
+  };
 
-    await setDoc(userRef, data, { merge: true })
+  // Create or merge the user profile
+  await setDoc(userRef, userData, { merge: true });
+};
 
-    console.log('User profile saved/updated:', user.uid)
-  } catch (error) {
-    console.error('Error saving user profile:', error)
+/**
+ * Save or update a playlist for a user.
+ * Data should include full song objects, not just IDs.
+ */
+export const savePlaylist = async (userId, playlistId, data) => {
+  if (!userId || !playlistId) return;
+
+  const playlistRef = doc(db, "users", userId, "playlists", playlistId);
+
+  // Always create if missing, update if exists
+  await setDoc(playlistRef, data, { merge: true });
+};
+
+/**
+ * Fetch a playlist safely.
+ */
+export const getPlaylist = async (userId, playlistId) => {
+  if (!userId || !playlistId) return null;
+
+  const playlistRef = doc(db, "users", userId, "playlists", playlistId);
+  const snap = await getDoc(playlistRef);
+
+  if (snap.exists()) {
+    return snap.data();
+  } else {
+    return null;
   }
-}
-
+};

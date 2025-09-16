@@ -30,7 +30,7 @@ const props = defineProps({
   },
 })
 
-console.log(props.playlist)
+// console.log(props.playlist)
 const { album } = props.playlist
 
 const showPlayButton = ref(false)

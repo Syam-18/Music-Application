@@ -67,12 +67,13 @@
       </div>
       <div class="progress-section">
         <span class="time current-time">4:05</span>
-        <div class="progress-bar">
+        <!-- <div class="progress-bar">
           <div class="progress-track">
             <div class="progress-fill" style="width: 65%"></div>
             <div class="progress-handle"></div>
           </div>
-        </div>
+        </div> -->
+        <input type="range" class="text-white">
         <span class="time total-time">6:23</span>
       </div>
     </div>
@@ -127,6 +128,17 @@
   padding: 0 16px;
   position: relative;
 }
+
+input[type="range"] {
+  -webkit-appearance: none; /* remove default styling */
+  width: 300px;
+  height: 8px;
+  background: hsl(0,0%,20%); /* track color */
+  border-radius: 4px;
+  color:white;
+  outline: none;
+}
+
 
 .player-left {
   display: flex;

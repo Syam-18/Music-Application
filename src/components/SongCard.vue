@@ -1,5 +1,5 @@
 <template>
-  <div class="playlist-card w-[180px] shrink-0" @click="router.push(`/track/${playlist.id}`)">
+  <div class="playlist-card w-[100px] md:w-[180px] shrink-0" @click="router.push(`/track/${playlist.id}`)">
     <div class="card-image">
       <img :src="album.images[0].url" :alt="playlist.name" />
       <div class="play-button" :class="{ show: showPlayButton }">
@@ -10,8 +10,8 @@
       </div>
     </div>
     <div class="card-content">
-      <h3 class="card-title text-md tracking-wider hover:underline">{{ playlist.name }}</h3>
-      <p class="card-description tracking-wider hover:underline" @click.stop="router.push(`/artist/${playlist.artists[0].id}`)">{{ playlist.artists[0].name }}</p>
+      <h3 class="card-title text-sm md:text-[18px] hover:underline">{{ playlist.name }}</h3>
+      <p class="card-description text-xs md:text-md tracking-wider hover:underline truncate" @click.stop="router.push(`/artist/${playlist.artists[0].id}`)">{{ playlist.artists[0].name }}</p>
     </div>
   </div>
 </template>
@@ -109,6 +109,7 @@ const playPlaylist = () => {
 
 .card-title {
   line-height: 1.6;
+  font-weight: 700;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -116,7 +117,6 @@ const playPlaylist = () => {
 }
 
 .card-description {
-  font-size: 14px;
   color: #b3b3b3;
   line-height: 1.6;
   display: -webkit-box;

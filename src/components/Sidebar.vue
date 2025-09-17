@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar md:flex flex-col">
     <div class="sidebar-header">
       <div class="flex items-center">
         <div class="flex items-center gap-3 text-[#b3b3b3] font-[700]">
@@ -41,12 +41,20 @@
 
 <style scoped>
 .sidebar {
-  width: 240px;
+  min-width:200px;
+  max-width: 300px;
   background: #000;
-  padding: 24px 8px 24px 24px;
   display: flex;
   flex-direction: column;
   border-right: 1px solid #1a1a1a;
+  display: none;
+  padding:20px;
+}
+
+@media (min-width: 768px) {
+  .sidebar {
+    display: flex;
+  }
 }
 
 .sidebar-header {
@@ -69,11 +77,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
   border-radius: 4px;
   color: #b3b3b3;
   cursor: pointer;
   transition: all 0.2s;
+  margin-bottom:10px;
   font-size: 14px;
 }
 

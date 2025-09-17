@@ -39,8 +39,8 @@
         </ul>
       </div>
       <div class="footer-column social-column">
-        <h3>Social</h3>
-        <div class="social-icons">
+        <h3 class="md:text-xl">Social</h3>
+        <div class="social-icons mb-4">
           <a href="#" aria-label="Instagram" class="social-icon instagram">
             <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
               <path
@@ -60,10 +60,11 @@
             </svg>
           </a>
         </div>
+        <p class="copyright">© 2025 Spotify AB</p>
       </div>
     </div>
+
     <hr />
-    <p class="copyright">© 2025 Spotify AB</p>
   </footer>
 </template>
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="album-card w-[180px] shrink-0 h-[100%]" @click="router.push(`/album/${album.id}`)">
+    <div class="album-card w-[100px] md:w-[180px] shrink-0 h-[100%]" @click="router.push(`/album/${album.id}`)">
       <div class="card-image">
         <img :src="album.images[0]?.url" :alt="album.name" />
         <div class="play-button" :class="{ show: showPlayButton }">
@@ -10,9 +10,9 @@
         </div>
       </div>
       <div class="card-content">
-        <h3 class="card-title text-md tracking-wider truncate">{{ album.name }}</h3>
+        <h3 class="card-title text-sm md:text-[18px] truncate">{{ album.name }}</h3>
         <div class="flex truncate gap-2" >
-          <p class="card-description tracking-wider hover:underline" v-for="artist in album.artists" @click.stop="router.push(`/artist/${artist.id}`)">
+          <p class="card-description text-xs tracking-wider" v-for="artist in album.artists" @click.stop="router.push(`/artist/${artist.id}`)">
           {{ artist.name}}
         </p>
         </div>
@@ -43,7 +43,6 @@ const playAlbum = () => {
 
 <style scoped>
 .album-card {
-  width: 180px;
   border-radius: 8px;
   padding: 12px;
   cursor: pointer;
@@ -101,14 +100,12 @@ const playAlbum = () => {
 }
 
 .card-title {
-  font-size: 16px;
   font-weight: 700;
   margin-bottom: 4px;
   line-height: 1.6;
 }
 
 .card-type {
-  font-size: 14px;
   color: #b3b3b3;
   line-height: 1.6;
 }

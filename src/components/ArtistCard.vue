@@ -10,8 +10,8 @@
       </div>
     </div>
     <div class="card-content">
-      <h3 class="card-title tracking-wider hover:underline" @click.stop="router.push(`/artist/${artist.id}`)">{{ artist.name }}</h3>
-      <p class="card-type tracking-wider">Artist</p>
+      <h3 class="card-title text-xs md:text-[18px] hover:underline truncate" @click.stop="router.push(`/artist/${artist.id}`)">{{ artist.name }}</h3>
+      <p class="card-type text-xs md:text-md tracking-wider">Artist</p>
     </div>
   </div>
 </template>
@@ -41,6 +41,12 @@ const playArtist = () => {
   padding: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
+}
+
+@media screen and (max-width: 768px) {
+  .artist-card {
+    width: 100px;
+  }
 }
 
 .artist-card:hover {
@@ -94,14 +100,18 @@ const playArtist = () => {
 }
 
 .card-title {
-  font-size: 16px;
   font-weight: 700;
   margin-bottom: 4px;
   line-height: 1.6;
 }
 
+@media (max-width: 678px) {
+  .card-title {
+    margin-bottom: 0px;
+  }
+}
+
 .card-type {
-  font-size: 14px;
   color: #b3b3b3;
   line-height: 1.6;
 }

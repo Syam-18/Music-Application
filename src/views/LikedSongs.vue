@@ -1,13 +1,10 @@
 <template>
-  <div class="liked-songs-container">
+  <div class="liked-songs-page">
     <!-- Header -->
     <div class="liked-songs-header">
       <div class="header-content">
         <div class="playlist-image">
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="currentColor">
-            <path
-              d="M15.724 4.22A4.313 4.313 0 0012.192.814a4.269 4.269 0 00-3.622 1.13.837.837 0 01-1.14 0 4.272 4.272 0 00-6.21 5.855l5.916 7.05a1.128 1.128 0 001.726 0l5.916-7.05a4.228 4.228 0 00.946-3.579z" />
-          </svg>
+          <div class="heart-icon">❤</div>
         </div>
         <div class="playlist-info">
           <span class="playlist-type">Playlist</span>
@@ -23,14 +20,12 @@
 
     <!-- Controls -->
     <div class="playlist-controls">
-      <button class="play-button" @click="playAll" :disabled="liked.length === 0">
-        ▶
-      </button>
+      <button class="play-button" @click="playAll" :disabled="liked.length === 0">▶</button>
       <button class="shuffle-button">🔀</button>
       <button class="more-button">⋮</button>
     </div>
 
-    <!-- Song Table -->
+    <!-- Songs Table -->
     <div class="songs-table">
       <div class="table-header">
         <div class="col-index">#</div>
@@ -50,82 +45,252 @@
             <span class="track-number">{{ index + 1 }}</span>
           </div>
           <div class="col-title">
-            <img :src="song.image || 'https://via.placeholder.com/40'" />
+            <img :src="song.img || 'https://via.placeholder.com/40'" />
             <div class="song-info">
-              <span class="song-title">{{ song.title || 'Unknown Title' }}</span>
-              <span class="song-artist">{{ song.artist || 'Unknown Artist' }}</span>
+              <span class="song-title">{{ song.title }}</span>
+              <span class="song-artist">{{ song.artist }}</span>
             </div>
           </div>
-          <div class="col-album">{{ song.album || '-' }}</div>
+          <div class="col-album">{{ song.album?.name || '-' }}</div>
           <div class="col-duration">
-            <button class="like-btn" :class="{ liked: true }" @click.stop="toggleLike(song.id)">
+            <button
+              class="like-btn"
+              :class="{ liked: liked.some((s) => s.id === song.id) }"
+              @click.stop="toggleLike(song.id)"
+            >
               ❤
             </button>
-            <span class="duration">{{ song.duration || "3:00" }}</span>
+            <span class="duration">{{ song.duration || '3:00' }}</span>
           </div>
         </div>
 
-        <div v-if="!loading && liked.length === 0" class="empty">
-          💔 No liked songs yet
-        </div>
+        <div v-if="!loading && liked.length === 0" class="empty">💔 No liked songs yet</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/firebase.js";
-import { saveUserProfile } from "@/services/userService";
-import { likeSong, getLikedSongs } from "@/services/musicService";
+import { ref } from 'vue'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '@/firebase.js'
+import { saveUserProfile } from '@/services/userService'
+import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
 
-const liked = ref([]);
-const loading = ref(true);
-const userRef = ref(null);
+const liked = ref([])
+const loading = ref(true)
+const userRef = ref(null)
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     try {
-      userRef.value = user;
-      await saveUserProfile(user);
-      liked.value = await getLikedSongs();
+      userRef.value = user
+      await saveUserProfile(user)
+      liked.value = await getLikedSongs()
+      console.log('Fetched liked songs:', liked.value)
     } catch (err) {
-      console.error("Error fetching liked songs:", err);
+      console.error('Error fetching liked songs:', err)
     }
   } else {
-    liked.value = [];
-    userRef.value = null;
+    liked.value = []
+    userRef.value = null
   }
-  loading.value = false;
-});
+  loading.value = false
+})
 
 async function toggleLike(songId) {
   try {
-    await likeSong(songId);
-    liked.value = await getLikedSongs();
+    const isLiked = liked.value.some((song) => song.id === songId)
+
+    if (isLiked) {
+      await unlikeSong(songId)
+    } else {
+      await likeSong(songId)
+    }
+
+    // Refresh liked list
+    liked.value = await getLikedSongs()
   } catch (err) {
-    console.error("Error liking/unliking:", err);
+    console.error('Error liking/unliking:', err)
   }
 }
 
 function playAll() {
   if (liked.value.length > 0) {
-    playSong(liked.value[0]);
+    playSong(liked.value[0])
   }
 }
 
 function playSong(song) {
-  console.log("Playing song:", song.title);
+  console.log('Playing song:', song.title)
   // Hook into your global store/player here
 }
 </script>
 
 <style scoped>
-  /* Page */ .liked-songs-page { min-height: 100vh; background: linear-gradient(180deg, #181818 0%, #000 100%); color: white; font-family: "Poppins", "Helvetica Neue", Arial, sans-serif; display: flex; flex-direction: column; animation: fadeIn 0.6s ease-in; }
-  /* Header */ .header { background: linear-gradient(135deg, #1db954 0%, #0d341b 100%); padding: 4rem 2rem 3rem; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); } .header h1 { font-size: 3rem; font-weight: 800; margin-bottom: 0.4rem; letter-spacing: -1px; } .header p { font-size: 1rem; color: #ddd; margin-bottom: 1.5rem; } .like-btn { background: #1db954; border: none; padding: 0.8rem 1.6rem; font-size: 1rem; font-weight: 600; color: white; border-radius: 30px; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4); } .like-btn:hover { background: #1ed760; transform: scale(1.05); box-shadow: 0 6px 20px rgba(29, 185, 84, 0.6); }
-  /* Songs List */ .songs-list { flex: 1; margin: 3rem auto; max-width: 700px; width: 100%; padding: 0 1.5rem; } .song-card { background: rgba(255, 255, 255, 0.05); border-radius: 14px; padding: 1.2rem 1.5rem; margin-bottom: 1.2rem; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; backdrop-filter: blur(8px); } .song-card:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); } .song-info { display: flex; align-items: center; gap: 1rem; } .song-icon { font-size: 1.6rem; } .song-title { font-size: 1.05rem; font-weight: 500; } .liked-badge { background: #1db954; color: white; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 1rem; border-radius: 20px; box-shadow: 0 2px 8px rgba(29, 185, 84, 0.5); }
-  /* Empty State */ .empty { text-align: center; padding: 3rem 2rem; background: rgba(255, 255, 255, 0.05); border-radius: 16px; color: #bbb; font-size: 1rem; font-style: italic; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); } .empty small { display: block; margin-top: 0.8rem; color: #888; font-style: normal; }
-  /* Navigation */ .nav-link { text-align: center; margin: 2.5rem 0; } .nav-link a { text-decoration: none; color: #bbb; font-weight: 500; transition: color 0.2s; } .nav-link a:hover { color: #fff; }
-  /* Animation */ @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+/* Page Layout */
+.liked-songs-page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #242424 0%, #000 100%);
+  color: white;
+  font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.liked-songs-header {
+  background: linear-gradient(135deg, #450af5, #c4efd9);
+  padding: 4rem 2rem 3rem;
+  display: flex;
+  align-items: flex-end;
+}
+.header-content {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5rem;
+}
+.playlist-image {
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, #1db954, #1ed760);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.heart-icon {
+  font-size: 4rem;
+  color: white;
+}
+.playlist-info {
+  display: flex;
+  flex-direction: column;
+}
+.playlist-type {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ddd;
+}
+.playlist-info h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0.2rem 0;
+}
+.playlist-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #aaa;
+  font-size: 0.95rem;
+}
+
+/* Controls */
+.playlist-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.5rem 2rem;
+}
+.play-button {
+  background: #1db954;
+  border: none;
+  color: black;
+  font-size: 2rem;
+  font-weight: bold;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.play-button:hover {
+  transform: scale(1.1);
+}
+.shuffle-button,
+.more-button {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.shuffle-button:hover,
+.more-button:hover {
+  color: white;
+}
+
+/* Table */
+.songs-table {
+  padding: 1rem 2rem;
+}
+.table-header {
+  display: grid;
+  grid-template-columns: 50px 3fr 2fr 100px;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #333;
+  font-size: 0.9rem;
+  color: #bbb;
+}
+.songs-list {
+  display: flex;
+  flex-direction: column;
+}
+.song-row {
+  display: grid;
+  grid-template-columns: 50px 3fr 2fr 100px;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.song-row:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.song-row img {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  margin-right: 1rem;
+}
+.song-info {
+  display: flex;
+  flex-direction: column;
+}
+.song-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.song-artist {
+  font-size: 0.8rem;
+  color: #aaa;
+}
+.like-btn {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+.like-btn.liked {
+  color: #1db954;
+}
+.like-btn:hover {
+  color: #1ed760;
+}
+.duration {
+  margin-left: 0.5rem;
+  font-size: 0.85rem;
+  color: #aaa;
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 2rem;
+  color: #bbb;
+  font-style: italic;
+}
 </style>

@@ -1,6 +1,6 @@
 <template>
 
-  <div class="playlist-card w-[180px] shrink-0">
+  <div class="playlist-card w-[100px] md:w-[180px] shrink-0">
     <div class="card-image bg-[hsl(0,0%,20%)] animate-pulse">
       <!-- <img :src="album.images[0].url" :alt="playlist.name" /> -->
     </div>

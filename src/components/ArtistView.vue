@@ -8,6 +8,7 @@ const topTracks = ref([])
 const topAlbums = ref([])
 const Route = useRoute()
 const isAlbumsLoading = ref(true)
+const isArtistLoading = ref(true)
 
 const getAccessToken = async () => {
   const url = 'https://accounts.spotify.com/api/token'
@@ -30,7 +31,12 @@ const getAccessToken = async () => {
   return data.access_token
 }
 const getArtistNames = (artists) => {
-  return artists?.map((a) => a.name).join(', ') || 'Unknown'
+  return (
+    artists
+      .slice(0, 2)
+      ?.map((a) => a.name)
+      .join(', ') || 'Unknown'
+  )
 }
 const formatDuration = (ms) => {
   const minutes = Math.floor(ms / 60000)
@@ -51,6 +57,7 @@ const getArtistById = async (id) => {
 
   const data = await res.json()
   artist.value = data
+  isArtistLoading.value = false
   // console.log('Artist details:', data) // 🔥 Full artist object
   return data
 }
@@ -89,6 +96,7 @@ const getArtistAlbums = async () => {
 
   const data = await res.json()
   topAlbums.value = data.items
+  isArtistLoading.value = false
   isAlbumsLoading.value = false
   // console.log('Artist albums:', data.items) // 🔥 Array of album objects
 }
@@ -98,36 +106,73 @@ getArtistAlbums()
 </script>
 <template>
   <div
-    class="bg-cover bg-no-repeat min-h-[50vh] w-full flex flex-col justify-end p-4 relative"
+    class="relative flex flex-col items-center bg-[hsl(0,0%,10%)] w-full h-[50vh] animate-pulse"
+    v-if="isArtistLoading"
+  >
+    <div class="bottom-0 left-0 absolute p-4">
+      <div class="bg-[hsl(0,0%,20%)] rounded w-[100px] h-[25px] animate-pulse mb-2"></div>
+      <div class="bg-[hsl(0,0%,20%)] rounded w-[150px] h-[25px] animate-pulse"></div>
+    </div>
+    <div
+      class="absolute top-4 right-4 w-[20%] aspect-square bg-[hsl(0,0%,20%)] animate-pulse hidden md:block"
+    ></div>
+  </div>
+  <div
+    class="relative flex flex-col justify-end bg-cover bg-no-repeat p-4 w-full min-h-[50vh]"
     :style="{ backgroundImage: `url(${artist.images[0].url})` }"
     v-if="artist.images && artist.images.length > 0"
   >
     <div class="z-2">
-      <p class="text-6xl font-semibold ml-4" style="margin-bottom: 4px">{{ artist.name }}</p>
-      <p class="text-[hsl(0,0%,80)] ml-4">
+      <p class="text-shadow-2xs ml-4 font-semibold text-4xl md:text-6xl" style="margin-bottom: 4px">
+        {{ artist.name }}
+      </p>
+      <p class="text-shadow-2xs ml-4 text-[hsl(0,0%,80)]">
         {{ artist.followers.total.toLocaleString() }} followers
       </p>
     </div>
-    <div class="bg-gradient-to-b from-transparent to-black/60 inset-0 z-1 absolute"></div>
+    <div class="z-1 absolute inset-0 bg-gradient-to-b from-transparent to-black/60"></div>
     <img
       :src="artist.images[0].url"
       alt="artist.name"
-      class="absolute w-[300px] h-[300px] top-4 right-4 shadow shadow-white"
+      class="hidden top-4 right-4 absolute md:flex shadow shadow-white w-[300px] h-[300px]"
     />
   </div>
-  <div class="flex">
+
+  <div class="flex mb-4">
     <div class="p-4">
-      <h1 class="text-3xl mt-4 mb-4 ml-4 pl-4 font-semibold">Popular</h1>
+      <h1 class="mt-4 mb-4 md:ml-4 pl-4 font-semibold text-2xl md:text-3xl">Popular</h1>
+      <div class="grow" v-if="isArtistLoading">
+        <div class="flex flex-col gap-1 md:w-[70vw] w-[100vw]">
+          <div v-for="i in 10" :key="i" class="flex items-center p-2 rounded-md mb-4 bg-[hsl(0,0%,8%)]">
+            <!-- Album cover -->
+            <div class=" h-10 bg-gray-700 rounded mr-4"></div>
+            <div class="flex flex-col gap-1">
+              <!-- Song title -->
+              <div class="h-4 w-40 bg-gray-700 rounded"></div>
+              <!-- Small text -->
+              <div class="h-3 w-24 bg-gray-700 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       <div v-for="(track, index) in topTracks.slice(0, 10)" :key="track.id">
-        <RouterLink :to="`/track/${track.id}`" class="track-row ml-4 pr-2 pt-3 pb-3">
-          <span class="track-number mr-2">{{ index + 1 }}</span>
-          <img :src="track.album.images[0].url" alt="" class="w-8 h-8 mr-3 rounded-sm" />
+        <RouterLink :to="`/track/${track.id}`" class="md:ml-4 pt-3 pr-2 pb-3 track-row">
+          <span class="md:mr-2 md:text-[16px] text-xs track-number">{{ index + 1 }}</span>
+          <img
+            :src="track.album.images[0].url"
+            alt=""
+            class="mr-3 rounded-sm w-6 md:w-8 h-6 md:h-8"
+          />
           <div class="track-info">
-            <p class="track-name">{{ track.name }}</p>
-            <p class="track-artists">{{ getArtistNames(track.artists) }}</p>
+            <p class="w-[50vw] md:w-auto truncate track-name">{{ track.name }}</p>
+            <p class="w-[50vw] md:w-auto track-artists trunacte">
+              {{ getArtistNames(track.artists) }}
+            </p>
           </div>
           <div class="track-actions">
-            <span class="heart"> ♥ </span>
+            <span class="text-2xl heart"> ♥ </span>
             <span class="track-duration">
               {{ formatDuration(track.duration_ms) }}
             </span>
@@ -135,18 +180,20 @@ getArtistAlbums()
         </RouterLink>
       </div>
     </div>
-
   </div>
-  <section class="mt-4">
-    <h2 class="font-semibold text-2xl mb-2">Popular Albums</h2>
+  <section class="mt-4 mb-4 ml-4 md:ml-0">
+    <h2 class="mb-2 font-semibold text-xl md:text-2xl">Popular Albums</h2>
 
     <div
       v-if="isAlbumsLoading"
-      class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10"
+      class="flex flex-row gap-4 w-[83vw] overflow-x-scroll scroll-container"
     >
       <CardSkeletonLoading v-for="n in 8" :key="n" />
     </div>
-    <div class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10" v-else>
+    <div
+      class="flex flex-row md:gap-4 w-[90vw] md:w-[83vw] overflow-x-scroll scroll-container"
+      v-else
+    >
       <AlbumCard v-for="album in topAlbums" :key="album.id" :album="album" />
     </div>
   </section>
@@ -169,8 +216,15 @@ getArtistAlbums()
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
-  width: 50vw;
+  width: 70vw;
 }
+
+@media screen and (max-width: 768px) {
+  .track-row {
+    width: 90vw;
+  }
+}
+
 .track-row:hover {
   background-color: hsl(0, 0%, 20%);
 }
@@ -201,7 +255,6 @@ getArtistAlbums()
 .heart {
   cursor: pointer;
   color: #888;
-  font-size: 16px;
   transition: color 0.2s;
 }
 .heart.liked {
@@ -212,6 +265,12 @@ getArtistAlbums()
   text-align: right;
   color: #aaa;
   font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .track-duration {
+    width: 20px;
+  }
 }
 
 .scroll-container {

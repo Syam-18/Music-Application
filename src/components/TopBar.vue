@@ -1,15 +1,22 @@
 <template>
-  <div class="topbar">
-    <div class="flex">
-    <div class="nav-buttons mr-4">
-      <button class="nav-btn" @click="$router.go(-1)">
+  <div class="topbar lg:w-[85vw] md:w-[75vw] mt-2 md:mt-0" v-if="showTopbar">
+    <button class="nav-btn md:hidden flex items-center justify-center" @click="$router.go(-1)">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path
             d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
           />
         </svg>
       </button>
-      <button class="nav-btn" @click="$router.go(+1)">
+    <div class="flex items-center">
+    <div class="nav-buttons mr-4 hidden md:flex">
+      <button class="nav-btn hidden md:flex" @click="$router.go(-1)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path
+            d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
+          />
+        </svg>
+      </button>
+      <button class="nav-btn hidden md:flex" @click="$router.go(+1)">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
           <path
             d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8l-6.47 6.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"
@@ -18,23 +25,23 @@
       </button>
     </div>
 
-    <div class="center-nav ml-4">
+    <div class="center-nav ml-4 hidden md:flex">
       <button
-        class="center-nav-btn"
+        class="center-nav-btn hover:bg-[hsl(0,0%,80%)] hidden md:flex"
         :class="{ active: $route.name === 'Home' }"
         @click="$router.push('/')"
       >
         <i class="fa-solid fa-house"></i>
         Home
       </button>
-      <button
+      <!-- <button
         class="center-nav-btn"
         :class="{ active: $route.name === 'Search' }"
-        @click="changeSearchPath"
+        @click="router.push('/discover')"
       >
-        <i class="fa-solid fa-magnifying-glass"></i>
+        <i class="fa-solid fa-magnifying-glass mr-2"></i>
         Discover
-      </button>
+      </button> -->
     </div>
 
     <div class="search-container" >
@@ -50,7 +57,7 @@
     </div>
   </div>
 
-    <div class="user-controls">
+    <div class="user-controls hidden md:flex">
       <div class="profile" v-if="store.user" @click="showUserMenu = !showUserMenu">
         <img :src="store.user.image" :alt="store.user.name" />
       </div>
@@ -64,7 +71,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { store } from '@/stores'
 
@@ -101,6 +108,17 @@ onMounted(() => {
     searchQuery.value = route.params.id
     getTracks(route.params.id)
   }
+})
+
+
+const showTopbar = computed(() => {
+  if(window.innerWidth > 768){
+    return true
+  }
+  if(window.innerWidth <= 768 && (route.name === 'TrackView' || route.name === 'AlbumView' || route.name === 'ArtistView')){
+    return true
+  }
+  return ((route.name === 'Search' || route.name === 'SearchResults'))
 })
 
 const changeSearchPath = () => {
@@ -161,6 +179,8 @@ const logout = () => {
   showUserMenu.value = false
   router.push('/login')
 }
+
+
 </script>
 
 <style scoped>
@@ -174,8 +194,14 @@ const logout = () => {
   border-bottom: 1px solid #1a1a1a;
 }
 
+@media screen and (max-width: 768px) {
+  .topbar {
+    padding: 8px 12px;
+    justify-content: center;
+  }
+}
+
 .nav-buttons {
-  display: flex;
   gap: 8px;
 }
 
@@ -185,10 +211,17 @@ const logout = () => {
   border: none;
   color: #fff;
   cursor: pointer;
-  display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+}
+
+@media screen and (max-width: 768px) {
+  .nav-btn {
+    width: 28px;
+    height: 28px;
+    margin-right:10px;
+  }
 }
 
 .nav-btn:hover:not(.disabled) {
@@ -201,13 +234,11 @@ const logout = () => {
 }
 
 .center-nav {
-  display: flex;
   gap: 8px;
   margin-right:20px;
 }
 
 .center-nav-btn {
-  display: flex;
   align-items: baseline;
   justify-content: start;
   gap: 8px;
@@ -240,6 +271,12 @@ const logout = () => {
   display: flex;
   align-items: center;
 }
+@media screen and (max-width: 768px) {
+  .search-box {
+    width: 80vw;
+    background-color: hsl(0, 0%, 15%);
+  }
+}
 
 .search-icon {
   position: absolute;
@@ -266,7 +303,6 @@ const logout = () => {
 }
 
 .user-controls {
-  display: flex;
   align-items: center;
   gap: 8px;
 }

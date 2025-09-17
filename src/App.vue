@@ -1,14 +1,14 @@
 <template>
   <div class="app">
     <div v-if="!isLoginPage" class="flex h-screen">
-      <Sidebar />
+      <Sidebar class="w-[100px]"/>
 
       <div class="flex flex-col grow">
         <TopBar class="sticky top-0 z-10" />
+        <NavBarMobile class="fixed bottom-0 left-0 right-0 z-10" />
 
-        <!-- scrollable area -->
-        <div class="grow overflow-auto hide-scrollbar">
-          <router-view />
+        <div class="grow overflow-auto hide-scrollbar" id="main-scroll">
+          <router-view class="min-h-[150vh]" />
           <Footer />
         </div>
       </div>
@@ -24,6 +24,7 @@ import { useRoute } from 'vue-router'
 import Sidebar from './components/Sidebar.vue'
 import TopBar from './components/TopBar.vue'
 import Footer from './components/Footer.vue'
+import NavBarMobile from './components/NavBarMobile.vue'
 import PlayerBar from './components/PlayerBar.vue'
 import AlbumView from './components/AlbumView.vue'
 
@@ -45,7 +46,7 @@ body {
 }
 
 .app {
-  height: 100vh;
+  /* height: 100vh; */
   display: flex;
   flex-direction: column;
 }

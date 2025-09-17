@@ -130,7 +130,7 @@ const getAlbums = async () => {
 <template>
   <div class="p-4 mt-4">
     <div class="flex gap-4 items-stretch mb-4" v-if="tracks.length || !areSongsLoading">
-      <RouterLink :to="`/track/${tracks[0].id}`" class="no-underline w-[25%] self-stretch h-full">
+      <RouterLink :to="`/track/${tracks[0].id}`" class="no-underline w-[35%] self-stretch h-full hidden md:block">
         <div>
           <h1 class="font-semibold text-2xl mb-2">Top Result</h1>
           <div class="bg-[hsl(0,0%,8%)] hover:bg-[hsl(0,0%,15%)] p-4 text-white rounded-md">
@@ -172,8 +172,11 @@ const getAlbums = async () => {
       </div>
     </div>
     <div class="flex gap-4 items-stretch mb-4 animate-pulse" v-else>
+
+
+
   <!-- Top Result Skeleton -->
-  <div class="no-underline w-[25%] self-stretch h-full">
+  <div class="no-underline w-[35%] self-stretch h-full hidden md:block">
     <div>
       <h1 class="font-semibold text-2xl mb-2">Top Result</h1>
       <div class="bg-[hsl(0,0%,8%)] p-4 rounded-md">
@@ -217,11 +220,11 @@ const getAlbums = async () => {
       <h1 class="font-semibold text-2xl mb-2">Artists</h1>
       <div
         v-if="isArtistsLoading"
-        class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10"
+        class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[90vw] md:w-[83vw] m-10"
       >
         <CardSkeletonLoading v-for="n in 8" :key="n" />
       </div>
-      <div class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10 " v-else>
+      <div class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[90vw] md:w-[83vw] m-10 " v-else>
         <ArtistCard
           v-for="artist in artists"
           :key="artist.id"
@@ -237,11 +240,11 @@ const getAlbums = async () => {
       <h2 class="font-semibold text-2xl mb-2">Albums</h2>
       <div
         v-if="isAlbumsLoading"
-        class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10"
+        class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[90vw] md:w-[83vw] m-10"
       >
         <CardSkeletonLoading v-for="n in 8" :key="n" />
       </div>
-      <div class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10" v-else>
+      <div class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[90vw] md:w-[83vw] m-10" v-else>
         <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
       </div>
     </section>

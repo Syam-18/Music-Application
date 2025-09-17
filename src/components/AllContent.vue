@@ -1,13 +1,13 @@
 <template>
   <div>
-    <section class="section">
-      <div class="section-header">
-        <h2>Trending Songs</h2>
+    <section class="section top-section">
+      <div class="section-header ">
+        <h2 class="">Trending Songs</h2>
       </div>
-      <div v-if="isLoading" class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10">
+      <div v-if="isLoading" class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] ">
         <CardSkeletonLoading v-for="n in 8" :key="n" />
       </div>
-      <div class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10" v-else>
+      <div class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[95vw] md:w-[83vw] " v-else>
         <SongCard
           v-for="playlist in trendingTracks"
           :key="playlist.duration_ms"
@@ -20,10 +20,10 @@
       <div class="section-header">
         <h2>Popular Artists</h2>
       </div>
-      <div v-if="isLoading" class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10">
+      <div v-if="isLoading" class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] ">
         <CardSkeletonLoading v-for="n in 8" :key="n" />
       </div>
-      <div class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10" v-else>
+      <div class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[95vw] md:w-[83vw] " v-else>
         <ArtistCard
           v-for="artist in artists"
           :key="artist.id"
@@ -39,10 +39,10 @@
       <div class="section-header">
         <h2>Popular Albums</h2>
       </div>
-      <div v-if="isAlbumsLoading" class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10">
+      <div v-if="isAlbumsLoading" class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] ">
         <CardSkeletonLoading v-for="n in 8" :key="n" />
       </div>
-      <div class="gap-4 scroll-container flex flex-row overflow-x-scroll w-[83vw] m-10" v-else>
+      <div class="md:gap-4 scroll-container flex flex-row overflow-x-scroll w-[95vw] md:w-[83vw] " v-else>
         <AlbumCard v-for="album in popularAlbums" :key="album.id" :album="album" />
       </div>
     </section>
@@ -239,6 +239,10 @@ onMounted(() => {
   margin-bottom: 48px;
 }
 
+.top-section {
+  margin-top: 20px;
+}
+
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -246,10 +250,23 @@ onMounted(() => {
   margin-bottom: 24px;
 }
 
+@media (max-width: 678px) {
+  .section-header {
+    margin-bottom:0px;
+  }
+}
+
+
 .section-header h2 {
   font-size: 24px;
   font-weight: 700;
   color: #fff;
+}
+
+@media (max-width: 678px) {
+  .section-header h2 {
+    font-size: 16px;
+  }
 }
 
 .section-nav {
@@ -308,6 +325,7 @@ onMounted(() => {
   display: none;
   /* Safari & Chrome */
 }
+
 
 @media (max-width: 768px) {
   .section-header {

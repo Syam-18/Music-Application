@@ -12,67 +12,79 @@ import Playlist from "@/views/Playlist.vue";
 import TrackView from "@/components/TrackView.vue";
 import ArtistView from "@/components/ArtistView.vue";
 import SearchResults from "@/components/SearchResults.vue";
+import LibraryMobile from "@/components/LibraryMobile.vue";
+
 
 const routes = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    name: 'Home',
     component: Home,
     meta: { requiresAuth: true },
   },
   {
-    path: "/search",
-    name: "Search",
+    path: '/search',
+    name: 'Search',
     component: Search,
     meta: { requiresAuth: true },
   },
   {
-    path: "/search/:id",
-    name: "SearchResults",
+    path: '/search/:id',
+    name: 'SearchResults',
     component: SearchResults,
     props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/liked-songs",
-    name: "LikedSongs",
+    path: '/liked-songs',
+    name: 'LikedSongs',
     component: LikedSongs,
     meta: { requiresAuth: true },
   },
   {
-    path: "/playlist/:id",
-    name: "Playlist",
+    path: '/playlist/:id',
+    name: 'Playlist',
     component: Playlist,
     props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/track/:id",
-    name: "TrackView",
+    path: '/track/:id',
+    name: 'TrackView',
     component: TrackView,
     props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/artist/:id",
-    name: "ArtistView",
+    path: '/artist/:id',
+    name: 'ArtistView',
     component: ArtistView,
     props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/album/:id",
-    name: "AlbumView",
-    component: () => import("@/components/AlbumView.vue"),
+    path: '/album/:id',
+    name: 'AlbumView',
+    component: () => import('@/components/AlbumView.vue'),
     props: true,
     meta: { requiresAuth: true },
   },
   {
-    path: "/login",
-    name: "Login",
+    path: '/login',
+    name: 'Login',
     component: Login,
   },
-];
+  {
+    path: '/library',
+    name: 'Library',
+    component:LibraryMobile,
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('@/components/NotFound.vue'),
+  },
+]
 
 const router = createRouter({
   history: createWebHistory(),
@@ -89,5 +101,12 @@ const router = createRouter({
 //     next();
 //   }
 // });
+
+router.afterEach(() => {
+  const container = document.getElementById('main-scroll')
+  if (container) {
+    container.scrollTo({ top: 0, behavior: 'smooth' }) // smooth scroll like Spotify
+  }
+})
 
 export default router;

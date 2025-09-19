@@ -19,44 +19,68 @@
     </div>
 
     <!-- Controls -->
-    <div class="playlist-controls">
+    <!-- <div class="playlist-controls">
       <button class="play-button" @click="playAll" :disabled="liked.length === 0">▶</button>
       <button class="shuffle-button">🔀</button>
       <button class="more-button">⋮</button>
-    </div>
+    </div> -->
 
     <!-- Songs Table -->
     <div class="songs-table">
       <div class="table-header">
         <div class="col-index">#</div>
-        <div class="col-title">Title</div>
-        <div class="col-album">Album</div>
+        <div class="col-title text-center md:text-left">Title</div>
+        <div class="col-album hidden md:block">Album</div>
         <div class="col-duration">⏱</div>
       </div>
 
-      <div class="songs-list">
+      <!--skeleton Loader-->
+      <div class="flex flex-col gap-1" v-if="loading">
+        <div v-for="i in 5" :key="i" class="flex items-center p-2 rounded-md bg-[hsl(0,0%,8%)]">
+          <!-- Album cover -->
+          <div class="w-10 h-10 bg-gray-700 rounded mr-4"></div>
+          <div class="flex flex-col gap-1">
+            <!-- Song title -->
+            <div class="h-4 w-40 bg-gray-700 rounded"></div>
+            <!-- Small text -->
+            <div class="h-3 w-24 bg-gray-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="songs-list" v-else>
         <div
           v-for="(song, index) in liked"
           :key="song.id"
-          class="song-row"
+          class="song-row cursor-pointer"
           @dblclick="playSong(song)"
+          @click="router.push(`/track/${song.id}`)"
         >
           <div class="col-index">
             <span class="track-number">{{ index + 1 }}</span>
           </div>
-          <div class="col-title">
-            <img :src="song.img || 'https://via.placeholder.com/40'" />
+          <div class="col-title flex items-center">
+            <img
+              :src="song.album?.images?.[0]?.url || 'https://via.placeholder.com/40'"
+              class="w-4 h-4"
+            />
             <div class="song-info">
-              <span class="song-title">{{ song.title }}</span>
-              <span class="song-artist">{{ song.artist }}</span>
+              <span class="song-title text-sm truncate w-[27vw]">{{ song.name }}</span>
+              <span
+                class="song-artist hover:underline text-xs"
+                @click.stop="router.push(`/artist/${song.album.artists[0].id}`)"
+                >{{ song.album?.artists?.[0].name }}</span
+              >
             </div>
           </div>
-          <div class="col-album">{{ song.album?.name || '-' }}</div>
+          <div class="col-album truncate text-xs hidden md:block">
+            {{ song.album?.name || '-' }}
+          </div>
           <div class="col-duration">
             <button
               class="like-btn"
               :class="{ liked: liked.some((s) => s.id === song.id) }"
-              @click.stop="toggleLike(song.id)"
+              @click.stop="toggleLike(song)"
             >
               ❤
             </button>
@@ -68,6 +92,16 @@
       </div>
     </div>
   </div>
+  <div v-if="showToast" class="toast">
+    {{ toastMessage }}
+    <span
+      v-if="toastType === 'song'"
+      @click="router.push('/liked-songs')"
+      class="text-blue-400 cursor-pointer"
+    >
+      Liked Songs
+    </span>
+  </div>
 </template>
 
 <script setup>
@@ -76,6 +110,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/firebase.js'
 import { saveUserProfile } from '@/services/userService'
 import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
+import router from '@/router'
 
 const liked = ref([])
 const loading = ref(true)
@@ -96,23 +131,36 @@ onAuthStateChanged(auth, async (user) => {
     userRef.value = null
   }
   loading.value = false
+  console.log(liked.value)
 })
 
-async function toggleLike(songId) {
-  try {
-    const isLiked = liked.value.some((song) => song.id === songId)
+const toastMessage = ref('')
+const showToast = ref(false)
+const toastType = ref('')
+
+function triggerToast(message, type) {
+  toastMessage.value = message
+  showToast.value = true
+  toastType.value = type
+  setTimeout(() => (showToast.value = false), 2000) // hides after 2s
+}
+
+async function toggleLike(song) {
+
+    const isLiked = liked.value.some((likedSong) => likedSong.id === song.id)
 
     if (isLiked) {
-      await unlikeSong(songId)
+      triggerToast('Removed from ', 'song')
+      liked.value = liked.value.filter((likedSong) => likedSong.id !== song.id)
+      await unlikeSong(song)
     } else {
-      await likeSong(songId)
+      triggerToast('Added to ', 'song')
+      liked.value = [...liked.value, song] 
+      await likeSong(song)
     }
 
     // Refresh liked list
     liked.value = await getLikedSongs()
-  } catch (err) {
-    console.error('Error liking/unliking:', err)
-  }
 }
 
 function playAll() {
@@ -182,7 +230,7 @@ function playSong(song) {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #aaa;
+  color: hsl(0, 0%, 80%);
   font-size: 0.95rem;
 }
 
@@ -226,6 +274,13 @@ function playSong(song) {
 .songs-table {
   padding: 1rem 2rem;
 }
+
+@media screen and (max-width: 768px) {
+  .songs-table {
+    padding: 10px;
+  }
+}
+
 .table-header {
   display: grid;
   grid-template-columns: 50px 3fr 2fr 100px;
@@ -233,6 +288,12 @@ function playSong(song) {
   border-bottom: 1px solid #333;
   font-size: 0.9rem;
   color: #bbb;
+}
+@media screen and (max-width: 768px) {
+  .table-header {
+    grid-template-columns: 15px 1fr 100px;
+    padding: 0.5rem 5px;
+  }
 }
 .songs-list {
   display: flex;
@@ -242,9 +303,16 @@ function playSong(song) {
   display: grid;
   grid-template-columns: 50px 3fr 2fr 100px;
   align-items: center;
-  padding: 0.6rem 0;
+  padding: 0.6rem 10px;
   border-radius: 6px;
   transition: background 0.2s;
+}
+
+@media screen and (max-width: 768px) {
+  .song-row {
+    grid-template-columns: 15px 1fr 100px;
+    padding: 0.5rem 5px;
+  }
 }
 .song-row:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -260,11 +328,9 @@ function playSong(song) {
   flex-direction: column;
 }
 .song-title {
-  font-size: 0.95rem;
   font-weight: 500;
 }
 .song-artist {
-  font-size: 0.8rem;
   color: #aaa;
 }
 .like-btn {
@@ -292,5 +358,18 @@ function playSong(song) {
   padding: 2rem;
   color: #bbb;
   font-style: italic;
+}
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  background: white;
+  color: hsl(0, 0%, 10%);
+  padding: 5px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0.95;
+  transition: all 0.3s ease;
 }
 </style>

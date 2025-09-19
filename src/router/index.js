@@ -6,13 +6,14 @@ import Home from "@/views/Home.vue";
 import Search from "@/views/Search.vue";
 import LikedSongs from "@/views/LikedSongs.vue";
 import Login from "@/views/Login.vue";
-import Playlist from "@/views/Playlist.vue";
+import Playlist from "@/views/Albums.vue";
 
 // Components
 import TrackView from "@/components/TrackView.vue";
 import ArtistView from "@/components/ArtistView.vue";
 import SearchResults from "@/components/SearchResults.vue";
 import LibraryMobile from "@/components/LibraryMobile.vue";
+import Albums from "@/views/Albums.vue";
 
 
 const routes = [
@@ -84,6 +85,11 @@ const routes = [
     name: 'NotFound',
     component: () => import('@/components/NotFound.vue'),
   },
+  {
+    path: '/saved-albums',
+    name: 'Saved Albums',
+    component: Albums,
+  }
 ]
 
 const router = createRouter({

@@ -1,6 +1,6 @@
 <script setup>
-import { likeSong } from '@/services/musicService'
-import { ref } from 'vue'
+import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
 const track = ref({})
@@ -26,7 +26,6 @@ const getAccessToken = async () => {
 
   localStorage.setItem('accessToken', data.access_token)
   localStorage.setItem('tokenExpiry', Date.now() + data.expires_in * 1000)
-  loading.value = false
   return data.access_token
 }
 const getTrack = async () => {
@@ -40,6 +39,7 @@ const getTrack = async () => {
 
   const data = await res.json()
   track.value = data
+  loading.value = false
   console.log(track.value)
 }
 getTrack()
@@ -51,24 +51,42 @@ function msToMinSec(ms) {
   return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
 
-const toggleLike = (trackId) => {
-  likeSong(trackId) // Call the service function to like the song
-  if (likedTracks.value.includes(trackId)) {
-    likedTracks.value = likedTracks.value.filter((id) => id !== trackId)
+const toastMessage = ref('')
+const showToast = ref(false)
+
+function triggerToast(message) {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => (showToast.value = false), 2000) // hides after 2s
+}
+
+
+const toggleLike = async (track) => {
+
+  if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
+    likedTracks.value = likedTracks.value.filter(
+      (likedTrack) => likedTrack.id !== track.id
+    )
+    triggerToast('Removed from ')
+    await unlikeSong(track)
   } else {
-    likedTracks.value.push(trackId)
+    likedTracks.value.push(track)
+    triggerToast('Added to ')
+    await likeSong(track)
+
   }
 }
+onMounted(async () => {
+  await getTrack()
+  likedTracks.value = await getLikedSongs() // 👈 sync with Firestore
+})
 </script>
 <template>
   <!-- Skeleton Loader -->
-  <div
-    v-if="loading"
-    class="p-4 w-full h-full flex flex-col items-center bg-[hsl(0,0%,10%)]"
-  >
-    <div class="rounded-2xl w-[90vw] md:w-[20vw] h-[40vh] animate-pulse bg-[hsl(0,0%,20%)] mb-8 mt-4 hidden md:block">
-
-    </div>
+  <div v-if="loading" class="p-4 w-full h-full flex flex-col items-center bg-[hsl(0,0%,10%)] min-h-[150vh]">
+    <div
+      class="rounded-2xl w-[90vw] md:w-[20vw] h-[40vh] animate-pulse bg-[hsl(0,0%,20%)] mb-8 mt-4 hidden md:block"
+    ></div>
     <div class="md:h-[40vh] w-[95vw] p-4 flex flex-col items-center gap-16 animate-pulse">
       <!-- Album Image -->
       <div class="rounded-md md:h-full w-full md:w-auto bg-[hsl(0,0%,20%)] h-[300px]"></div>
@@ -101,19 +119,22 @@ const toggleLike = (trackId) => {
     </div>
   </div>
 
-
-
   <!-- real code -->
   <div
+    v-else
     v-if="track && track.album"
-    class="p-8 bg-[url('https://i.pinimg.com/1200x/a8/67/8e/a8678e6959187e63856eff5358995c7f.jpg')] bg-cover w-[100%] min-h-[100vh] flex flex-col items-center"
+    class="p-8 bg-[url('https://i.pinimg.com/1200x/a8/67/8e/a8678e6959187e63856eff5358995c7f.jpg')] bg-cover w-[100%] min-h-[150vh] flex flex-col items-center"
   >
     <div class="md:h-[40vh] w-[95vw] p-8 flex flex-col items-center gap-16">
-      <img :src="track.album.images[0].url" alt="track.name" class="rounded-md md:h-full w-full md:w-auto" />
+      <img
+        :src="track.album.images[0].url"
+        alt="track.name"
+        class="rounded-md md:h-full w-full md:w-auto"
+      />
       <div class="flex flex-col gap-5 self-start">
         <h1 class="text-3xl md:text-6xl song-name">{{ track.name }}</h1>
-        <div class="flex">
-          <div class="flex gap-2 mr-2 md:mr-4">
+        <div class="flex items-center gap-2 md:gap-4 flex-wrap">
+          <div class="flex gap-2 mr-2 md:mr-4" style="margin-right:20px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hidden md:flex">
               <circle cx="8" cy="7" r="2" stroke="#B0B0B0" stroke-width="1.5" />
               <path
@@ -129,31 +150,26 @@ const toggleLike = (trackId) => {
                 stroke-linecap="round"
               />
             </svg>
-            <p @click="router.push(`/artist/${track.album.artists[0].id}`)" class="cursor-pointer hover: text-xs md:text-[16px]">{{ track.album.artists[0].name }}</p>
+            <p
+              @click="router.push(`/artist/${track.album.artists[0].id}`)"
+              class="cursor-pointer hover: text-xs md:text-[16px]"
+            >
+              {{ track.album.artists[0].name }}
+            </p>
           </div>
-          <div class="flex gap-2 mr-2 md:mr-4">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hidden md:flex">
-              <circle cx="8" cy="7" r="2" stroke="#B0B0B0" stroke-width="1.5" />
-              <path
-                d="M6 16c0-3 2.5-5 5-5s5 2 5 5"
-                stroke="#B0B0B0"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-              <path
-                d="M17 11v5a2 2 0 1 0 4 0v-3"
-                stroke="#B0B0B0"
-                stroke-width="1.5"
-                stroke-linecap="round"
-              />
-            </svg>
-            <p class="text-xs md:text-[16px]">{{ track.album.name }}</p>
+          <div class="flex gap-2 mr-2 md:mr-4 items-center" style="margin-right:20px;">
+            <div class="w-5 h-5 rounded-full border-1 flex justify-center items-center">
+              <div class="w-3 h-3 rounded-full border-2"></div>
+            </div>
+            <p class="text-xs md:text-[16px] cursor-pointer" @click.stop="router.push(`/album/${track.album.id}`)">{{ track.album.name }}</p>
           </div>
-          <p class=" mr-2 md:mr-4 text-xs md:text-[16px]">{{ track.album.release_date.slice(0, 4) }}</p>
-          <p class=" mr-2 md:mr-4 text-xs md:text-[16px]">{{ msToMinSec(track.duration_ms) }}</p>
+          <p class="mr-2 md:mr-4 text-xs md:text-[16px]">
+            {{ track.album.release_date.slice(0, 4) }}
+          </p>
+          <p class="mr-2 md:mr-4 text-xs md:text-[16px]">{{ msToMinSec(track.duration_ms) }}</p>
           <div class="gap-2 items-center hidden md:flex">
             <i class="fa-solid fa-fire-flame-curved text-xs md:text-[16px]"></i>
-            <p class="text-xs md:text-[16px] ">{{ track.popularity }}</p>
+            <p class="text-xs md:text-[16px]">{{ track.popularity }}</p>
           </div>
         </div>
         <div class="flex md:hidden items-center gap-5 mt-4">
@@ -163,13 +179,15 @@ const toggleLike = (trackId) => {
             <i class="fa-solid fa-play text-black"></i>
           </div>
           <span
-            class="heart"
-            :class="{ liked: likedTracks.includes(track.id) }"
-            @click="toggleLike(track.id)"
+            class="heart "
+            :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id)}"
+            @click="toggleLike(track)"
           >
             ♥
           </span>
-          <div class="border-[hsl(0,0%,50%)] border-2 relative cursor-pointer flex items-center justify-center z-4 ">
+          <div
+            class="border-[hsl(0,0%,50%)] border-2 relative cursor-pointer flex items-center justify-center z-4"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="bg-black">
               <path
                 d="M12 5v14M5 12h14"
@@ -179,18 +197,19 @@ const toggleLike = (trackId) => {
               />
             </svg>
             <div
-              class="absolute -top-2 border-[hsl(0,0%,50%)] border-2 text-black inset-0 flex items-center justify-center text-xs z-3"></div>
+              class="absolute -top-2 border-[hsl(0,0%,50%)] border-2 text-black inset-0 flex items-center justify-center text-xs z-3"
+            ></div>
           </div>
         </div>
         <div class="flex gap-2 flex-wrap md:flex-nowrap">
           <div
             v-for="genre in genres"
-            class="border-[hsl(0,0%,50%)] border-2 rounded-3xl px-4py-2  self-start"
+            class="border-[hsl(0,0%,50%)] border-2 rounded-3xl px-4py-2 self-start"
           >
             <p class="text-xs md:text-[16px]">{{ genre }}</p>
           </div>
         </div>
-        <div class="items-center gap-5 mt-4 hidden md:flex" >
+        <div class="items-center gap-5 mt-4 hidden md:flex">
           <div
             class="bg-[hsl(120,50%,50%)] p-4 w-[40px] h-[40px] rounded-full flex items-center justify-center cursor-pointer"
           >
@@ -198,12 +217,14 @@ const toggleLike = (trackId) => {
           </div>
           <span
             class="heart"
-            :class="{ liked: likedTracks.includes(track.id) }"
-            @click="toggleLike(track.id)"
+            :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
+            @click="toggleLike(track)"
           >
             ♥
           </span>
-          <div class="border-[hsl(0,0%,50%)] border-2 relative cursor-pointer flex items-center justify-center z-4 ">
+          <div
+            class="border-[hsl(0,0%,50%)] border-2 relative cursor-pointer flex items-center justify-center z-4"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="bg-black">
               <path
                 d="M12 5v14M5 12h14"
@@ -213,7 +234,8 @@ const toggleLike = (trackId) => {
               />
             </svg>
             <div
-              class="absolute -top-2 border-[hsl(0,0%,50%)] border-2 text-black inset-0 flex items-center justify-center text-xs z-3"></div>
+              class="absolute -top-2 border-[hsl(0,0%,50%)] border-2 text-black inset-0 flex items-center justify-center text-xs z-3"
+            ></div>
           </div>
         </div>
         <div class="flex flex-col gap-1">
@@ -226,6 +248,8 @@ const toggleLike = (trackId) => {
       </div>
     </div>
   </div>
+  <div v-if="showToast" class="toast">{{ toastMessage }} <span @click="router.push('/liked-songs')" class="text-blue-400 cursor-pointer">Liked Songs</span></div>
+
 </template>
 <style scoped>
 .p-8 {
@@ -249,5 +273,17 @@ const toggleLike = (trackId) => {
 .heart.liked {
   color: red;
 }
-
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  background: white;
+  color: hsl(0, 0%, 10%);
+  padding: 5px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
 </style>

@@ -1,14 +1,49 @@
 <script setup>
 import { ref, onMounted } from 'vue'
+import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
 import { useRoute } from 'vue-router'
 import AlbumCard from './AlbumCard.vue'
 import CardSkeletonLoading from './CardSkeletonLoading.vue'
+import router from '@/router'
 const artist = ref({})
 const topTracks = ref([])
 const topAlbums = ref([])
 const Route = useRoute()
+const likedTracks = ref([])
+const toastMessage = ref('')
+
+const showToast = ref(false)
+
+function triggerToast(message) {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => (showToast.value = false), 2000) // hides after 2s
+}
+
 const isAlbumsLoading = ref(true)
 const isArtistLoading = ref(true)
+
+
+
+const toggleLike = async (track) => {
+
+  if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
+    likedTracks.value = likedTracks.value.filter((likedTrack) => likedTrack.id !== track.id)
+    triggerToast('Removed from liked songs')
+    await unlikeSong(track)
+  } else {
+    likedTracks.value.push(track)
+    triggerToast('Added to liked songs')
+    await likeSong(track)
+  }
+
+}
+onMounted(async () => {
+  await getArtistById(Route.params.id)
+  await getArtistTopTracks(Route.params.id)
+  await getArtistAlbums()
+  likedTracks.value = await getLikedSongs() // 👈 sync with Firestore
+})
 
 const getAccessToken = async () => {
   const url = 'https://accounts.spotify.com/api/token'
@@ -100,13 +135,11 @@ const getArtistAlbums = async () => {
   isAlbumsLoading.value = false
   // console.log('Artist albums:', data.items) // 🔥 Array of album objects
 }
-getArtistTopTracks(Route.params.id)
-getArtistById(Route.params.id)
-getArtistAlbums()
+
 </script>
 <template>
   <div
-    class="relative flex flex-col items-center bg-[hsl(0,0%,10%)] w-full h-[50vh] animate-pulse"
+    class="relative flex flex-col items-center bg-[hsl(0,0%,10%)] w-full h-[50vh] animate-pulse "
     v-if="isArtistLoading"
   >
     <div class="bottom-0 left-0 absolute p-4">
@@ -143,9 +176,13 @@ getArtistAlbums()
       <h1 class="mt-4 mb-4 md:ml-4 pl-4 font-semibold text-2xl md:text-3xl">Popular</h1>
       <div class="grow" v-if="isArtistLoading">
         <div class="flex flex-col gap-1 md:w-[70vw] w-[100vw]">
-          <div v-for="i in 10" :key="i" class="flex items-center p-2 rounded-md mb-4 bg-[hsl(0,0%,8%)]">
+          <div
+            v-for="i in 10"
+            :key="i"
+            class="flex items-center p-2 rounded-md mb-4 bg-[hsl(0,0%,8%)]"
+          >
             <!-- Album cover -->
-            <div class=" h-10 bg-gray-700 rounded mr-4"></div>
+            <div class="h-10 bg-gray-700 rounded mr-4"></div>
             <div class="flex flex-col gap-1">
               <!-- Song title -->
               <div class="h-4 w-40 bg-gray-700 rounded"></div>
@@ -155,7 +192,6 @@ getArtistAlbums()
           </div>
         </div>
       </div>
-
 
       <div v-for="(track, index) in topTracks.slice(0, 10)" :key="track.id">
         <RouterLink :to="`/track/${track.id}`" class="md:ml-4 pt-3 pr-2 pb-3 track-row">
@@ -172,7 +208,13 @@ getArtistAlbums()
             </p>
           </div>
           <div class="track-actions">
-            <span class="text-2xl heart"> ♥ </span>
+            <span
+              class="text-2xl md:text-4xl heart"
+              @click.stop.prevent="toggleLike(track)"
+              :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
+            >
+              ♥
+            </span>
             <span class="track-duration">
               {{ formatDuration(track.duration_ms) }}
             </span>
@@ -197,8 +239,31 @@ getArtistAlbums()
       <AlbumCard v-for="album in topAlbums" :key="album.id" :album="album" />
     </div>
   </section>
+  <div v-if="showToast" class="toast">{{ toastMessage }} <span @click="router.push('/liked-songs')" class="text-blue-400 cursor-pointer">Liked Songs</span></div>
 </template>
+
 <style scoped>
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  background: white;
+  color: hsl(0, 0%, 10%);
+  padding: 5px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
+
+@media screen and (max-width: 768px) {
+  .toast{
+    left:0;
+    bottom: 3rem;
+  }
+}
+
 .track-list {
   margin-top: 16px;
 }

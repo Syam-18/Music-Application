@@ -1,14 +1,5 @@
 // services/musicService.js
-import {
-  doc,
-  setDoc,
-  arrayUnion,
-  getDoc,
-  collection,
-  addDoc,
-  getDocs,
-  serverTimestamp,
-} from 'firebase/firestore'
+import { doc, setDoc, arrayUnion, getDoc, collection, getDocs } from 'firebase/firestore'
 import { db, auth } from '@/firebase.js'
 
 // -------------------------------
@@ -27,7 +18,7 @@ export async function likeSong(song) {
 // -------------------------------
 // Unlike a song (remove full song object)
 // -------------------------------
-export async function unlikeSong(songId) {
+export async function unlikeSong(song) {
   const user = auth.currentUser
   if (!user) throw new Error('No authenticated user found')
 
@@ -36,7 +27,7 @@ export async function unlikeSong(songId) {
   if (!snap.exists()) return
 
   const likedSongs = snap.data().likedSongs || []
-  const updatedSongs = likedSongs.filter((s) => s.id !== songId)
+  const updatedSongs = likedSongs.filter((s) => s.id !== song.id)
 
   await setDoc(userRef, { likedSongs: updatedSongs }, { merge: true })
 }
@@ -53,55 +44,61 @@ export async function getLikedSongs() {
   return snap.exists() ? snap.data().likedSongs || [] : []
 }
 
-// -------------------------------
-// Create a new playlist (songs as full objects)
-// -------------------------------
-export async function createPlaylist(name, songs = []) {
+// // -------------------------------
+// // Create a new playlist (songs as full objects)
+// // -------------------------------
+// export async function createPlaylist(name, songs = []) {
+//   const user = auth.currentUser
+//   if (!user) throw new Error('No authenticated user found')
+
+//   const playlistsRef = collection(db, 'users', user.uid, 'playlists')
+//   const docRef = await addDoc(playlistsRef, {
+//     name,
+//     songs,
+//     createdAt: serverTimestamp(),
+//   })
+
+//   return docRef.id // return playlist ID
+// }
+
+export async function addAlbumToAlbums(album) {
   const user = auth.currentUser
   if (!user) throw new Error('No authenticated user found')
 
-  const playlistsRef = collection(db, 'users', user.uid, 'playlists')
-  const docRef = await addDoc(playlistsRef, {
-    name,
-    songs,
-    createdAt: serverTimestamp(),
-  })
+  const userRef = doc(db, 'users', user.uid)
 
-  return docRef.id // return playlist ID
+  // Save full album object
+  // Using a separate field 'likedAlbums' to keep it distinct from 'likedSongs'
+  await setDoc(userRef, { likedAlbums: arrayUnion(album) }, { merge: true })
 }
 
 // -------------------------------
-// Get all playlists
+// Unlike an album (remove full album object)
 // -------------------------------
-export async function getPlaylists() {
+export async function removeAlbumFromAlbums(albumId) {
   const user = auth.currentUser
   if (!user) throw new Error('No authenticated user found')
 
-  const playlistsRef = collection(db, 'users', user.uid, 'playlists')
-  const snap = await getDocs(playlistsRef)
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+  const userRef = doc(db, 'users', user.uid)
+  const snap = await getDoc(userRef)
+  if (!snap.exists()) return // No document or no liked albums to remove
+
+  const likedAlbums = snap.data().likedAlbums || []
+  // Filter out the album with the matching ID
+  const updatedAlbums = likedAlbums.filter((a) => a !== albumId)
+
+  await setDoc(userRef, { likedAlbums: updatedAlbums }, { merge: true })
 }
 
 // -------------------------------
-// Add a song (full object) to a playlist
+// Get all liked albums
 // -------------------------------
-export async function addSongToPlaylist(playlistId, song) {
+export async function getAlbums() {
   const user = auth.currentUser
   if (!user) throw new Error('No authenticated user found')
 
-  const playlistRef = doc(db, 'users', user.uid, 'playlists', playlistId)
-
-  await setDoc(playlistRef, { songs: arrayUnion(song) }, { merge: true })
-}
-
-// -------------------------------
-// Get all songs from a specific playlist
-// -------------------------------
-export async function getPlaylistSongs(playlistId) {
-  const user = auth.currentUser
-  if (!user) throw new Error('No authenticated user found')
-
-  const playlistRef = doc(db, 'users', user.uid, 'playlists', playlistId)
-  const snap = await getDoc(playlistRef)
-  return snap.exists() ? snap.data().songs || [] : []
+  const userRef = doc(db, 'users', user.uid)
+  const snap = await getDoc(userRef)
+  // Return the likedAlbums array, or an empty array if not found
+  return snap.exists() ? snap.data().likedAlbums || [] : []
 }

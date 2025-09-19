@@ -1,38 +1,35 @@
 <template>
-  <div class="spotify-page">
-    <!-- Blurred Background -->
-    <div></div>
-
+  <div class="min-h-[150vh] spotify-page">
     <!-- Content -->
     <div class="content">
       <!-- Left Section -->
       <div class="left-section">
         <!-- Album Header -->
-        <div class="album-header flex">
-          <div class="w-[70vw] md:w-auto pt-4">
-            <h1 class="album-title text-xl md:text-3xl">{{ album?.name || 'Unknown Album' }}</h1>
-            <p class="album-meta text-xs md:text-[14px]">
+        <div class="flex album-header">
+          <div class="pt-4 w-[70vw] md:w-auto">
+            <h1 class="text-xl md:text-3xl album-title">{{ album?.name || 'Unknown Album' }}</h1>
+            <p class="md:text-[14px] text-xs album-meta">
               {{ getArtistNames(album?.artists) }} •
               {{ album?.release_date?.slice(0, 4) || '----' }} • {{ tracks.length }} songs •
               {{ totalDuration }}
             </p>
-            <div class="featured-artists md:hidden" v-if="featuredArtists.length">
+            <div class="md:hidden featured-artists" v-if="featuredArtists.length">
               <ul>
                 <li
                   v-for="artist in featuredArtists"
                   :key="artist.id"
-                  class="artist-row hover:underline cursor-pointer"
+                  class="hover:underline cursor-pointer artist-row"
                   @click="router.push(`/artist/${artist.id}`)"
                 >
                   <div class="artist-avatar">
                     <img :src="artist.images?.[0]?.url || fallbackImage" alt="Artist" />
                   </div>
-                  <span class="text-xs md:text-[16px]">{{ artist.name }}</span>
+                  <span class="md:text-[16px] text-xs">{{ artist.name }}</span>
                 </li>
               </ul>
             </div>
           </div>
-          <div class="right-section self-start md:hidden mt-4">
+          <div class="md:hidden right-section self-start mt-4">
             <!-- Album Cover -->
             <div class="album-cover">
               <img :src="album?.images?.[0]?.url || fallbackImage" alt="Album Cover" />
@@ -46,47 +43,62 @@
             </div>
 
             <!-- Featured Artists -->
-
           </div>
         </div>
 
         <!-- Controls -->
         <div class="controls">
-          <button class="play-btn flex items-center justify-center">▶</button>
-          <button class="icon-btn text-4xl">♡</button>
-          <button class="icon-btn">⟳</button>
-          <button class="icon-btn">⋯</button>
+          <button class="flex justify-center items-center play-btn">▶</button>
+          <button
+            class="flex justify-center items-center p-1 border-2 rounded-full w-8 h-8 aspect-square cursor-pointer"
+            @click="toggleAlbum(album.id)"
+            :class="{ 'bg-green-400 border-none text-black': albumIds.includes(album?.id) }"
+          >
+            <i
+              class="fa-solid fa-plus"
+              :class="{ 'fa-check text-lg': albumIds.includes(album?.id) }"
+            ></i>
+          </button>
         </div>
 
         <!-- Track List -->
         <div class="track-list">
           <div class="grow" v-if="loadingAlbum">
-        <div class="flex flex-col gap-1 md:w-[55vw] w-[100vw]">
-          <div v-for="i in 10" :key="i" class="flex items-center p-2 rounded-md mb-4 bg-[hsl(0,0%,8%)]">
-            <!-- Album cover -->
-            <div class=" h-10 bg-gray-700 rounded mr-4"></div>
-            <div class="flex flex-col gap-1">
-              <!-- Song title -->
-              <div class="h-4 w-40 bg-gray-700 rounded"></div>
-              <!-- Small text -->
-              <div class="h-3 w-24 bg-gray-700 rounded"></div>
+            <div class="flex flex-col gap-1 w-[100vw] md:w-[55vw]">
+              <div
+                v-for="i in 10"
+                :key="i"
+                class="flex items-center bg-[hsl(0,0%,8%)] mb-4 p-2 rounded-md"
+              >
+                <!-- Album cover -->
+                <div class="bg-gray-700 mr-4 rounded h-10"></div>
+                <div class="flex flex-col gap-1">
+                  <!-- Song title -->
+                  <div class="bg-gray-700 rounded w-40 h-4"></div>
+                  <!-- Small text -->
+                  <div class="bg-gray-700 rounded w-24 h-3"></div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
           <div v-else>
-            <div v-for="(track, index) in tracks.slice(0, 10)" :key="track.id" class="track-row relative z-2 bg-[hsl(0,0%,8%)] mb-2">
-              <router-link :to="`/track/${track.id}`" class="absolute inset-0"></router-link>
-              <span class="track-number text-xs md:text-[16px]">{{ index + 1 }}</span>
+            <div
+              v-for="(track, index) in tracks.slice(0, 10)"
+              :key="track.id"
+              class="z-2 relative bg-[hsl(0,0%,8%)] mb-2 track-row"
+              @click="router.push(`/track/${track.id}`)"
+            >
+              <!-- {{ track }} -->
+              <span class="md:text-[16px] text-xs track-number">{{ index + 1 }}</span>
               <div class="track-info">
-                <p class="track-name text-md md:text-[16px] truncate w-[45vw]">{{ track.name }}</p>
+                <p class="w-[45vw] text-md md:text-[16px] truncate track-name">{{ track.name }}</p>
                 <p class="track-artists">{{ getArtistNames(track.artists) }}</p>
               </div>
               <div class="track-actions">
                 <span
-                  class="heart text-[16px] md:text-2xl"
-                  :class="{ liked: likedTracks.includes(track.id) }"
-                  @click="toggleLike(track.id)"
+                  class="text-2xl md:text-4xl heart"
+                  :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
+                  @click.stop.prevent="toggleLike({ album: album, ...track })"
                 >
                   ♥
                 </span>
@@ -100,7 +112,7 @@
       </div>
 
       <!-- Right Section -->
-      <div class="right-section hidden md:block">
+      <div class="hidden md:block right-section">
         <!-- Album Cover -->
         <div class="album-cover">
           <img :src="album?.images?.[0]?.url || fallbackImage" alt="Album Cover" />
@@ -119,7 +131,7 @@
             <li
               v-for="artist in featuredArtists"
               :key="artist.id"
-              class="artist-row hover:underline cursor-pointer"
+              class="hover:underline cursor-pointer artist-row"
               @click="router.push(`/artist/${artist.id}`)"
             >
               <div class="artist-avatar">
@@ -132,10 +144,38 @@
       </div>
     </div>
   </div>
+  <div v-if="showToast" class="toast">
+    {{ toastMessage }}
+    <span
+      v-if="toastType === 'song'"
+      @click="router.push('/liked-songs')"
+      class="text-blue-400 cursor-pointer"
+    >
+      Liked Songs
+    </span>
+    <span
+      v-else-if="toastType === 'album'"
+      @click="router.push('/saved-albums')"
+      class="text-blue-400 cursor-pointer"
+    >
+      Saved Albums
+    </span>
+  </div>
 </template>
 
 <script setup>
 defineOptions({ name: 'AlbumPage' })
+import { auth } from '@/firebase'
+import {
+  likeSong,
+  unlikeSong,
+  getLikedSongs,
+  addAlbumToAlbums,
+  removeAlbumFromAlbums,
+  getAlbums,
+} from '@/services/musicService'
+import { saveUserProfile } from '@/services/userService'
+import { onAuthStateChanged } from 'firebase/auth'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -147,6 +187,86 @@ const featuredArtists = ref([])
 const fallbackImage = 'https://via.placeholder.com/300x300?text=No+Image'
 const Route = useRoute()
 const router = useRouter()
+
+const toastMessage = ref('')
+const showToast = ref(false)
+const toastType = ref('')
+
+function triggerToast(message, type) {
+  toastMessage.value = message
+  showToast.value = true
+  toastType.value = type
+  setTimeout(() => (showToast.value = false), 2000) // hides after 2s
+}
+
+const toggleLike = async (track) => {
+  if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
+    likedTracks.value = likedTracks.value.filter((likedTrack) => likedTrack.id !== track.id)
+    triggerToast('Removed from ', 'song')
+    await unlikeSong(track)
+  } else {
+    likedTracks.value.push(track)
+    triggerToast('Added to ', 'song')
+    await likeSong(track)
+  }
+}
+
+const toggleAlbum = async (albumId) => {
+  if (albumIds.value.includes(albumId)) {
+    albumIds.value = albumIds.value.filter((AlbumId) => AlbumId !== albumId)
+    triggerToast('Removed from ', 'album')
+    await removeAlbumFromAlbums(albumId)
+  } else {
+    albumIds.value.push(albumId)
+    triggerToast('Added to ', 'album')
+    await addAlbumToAlbums(albumId)
+  }
+}
+
+const loading = ref(true)
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    await saveUserProfile(user)
+    await loadAlbums()
+  } else {
+    albumIds.value = []
+  }
+  loading.value = false
+})
+
+const albumIds = ref([])
+
+async function loadAlbums() {
+  albumIds.value = await getAlbums()
+  console.log(albumIds.value)
+  await getPopularAlbums()
+}
+
+const popularAlbums = ref([])
+
+const getPopularAlbums = async () => {
+  const token = await getAccessToken()
+  let allPopularAlbums = []
+
+  for (const albumId of albumIds.value) {
+    const res = await fetch(`https://api.spotify.com/v1/albums/${albumId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await res.json()
+
+    // console.log('API response for', albumId, ':', data)
+
+    if (data && data.id) {
+      allPopularAlbums.push(data) // ✅ push album object directly
+    } else {
+      console.error('No album found for ID:', albumId)
+    }
+  }
+
+  popularAlbums.value = allPopularAlbums
+  console.log('Final popular albums list:', popularAlbums.value)
+}
 
 const formatDuration = (ms) => {
   const minutes = Math.floor(ms / 60000)
@@ -203,7 +323,7 @@ const fetchAlbumData = async () => {
   } finally {
     loadingAlbum.value = false
   }
-  console.log(album.value)
+  // console.log(album.value)
 }
 
 const totalDuration = computed(() => {
@@ -214,23 +334,15 @@ const totalDuration = computed(() => {
   return hours ? `${hours} hr ${minutes} min` : `${minutes} min`
 })
 
-const toggleLike = (trackId) => {
-  if (likedTracks.value.includes(trackId)) {
-    likedTracks.value = likedTracks.value.filter((id) => id !== trackId)
-  } else {
-    likedTracks.value.push(trackId)
-  }
-}
-
-onMounted(() => {
+onMounted(async () => {
   fetchAlbumData()
+  likedTracks.value = await getLikedSongs() // 👈 sync with Firestore
 })
 </script>
 
 <style scoped>
 .spotify-page {
   position: relative;
-  min-height: 100vh;
   overflow: hidden;
   color: #fff;
   font-family: 'Inter', sans-serif;
@@ -438,8 +550,27 @@ onMounted(() => {
   .artist-avatar img {
     width: 30px;
     height: 30px;
-    border-radius:100%;
+    border-radius: 100%;
   }
+}
 
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  background: white;
+  color: hsl(0, 0%, 10%);
+  padding: 5px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0.95;
+  transition: all 0.3s ease;
+}
+
+@media screen and (max-width: 768px) {
+  .toast {
+    left: 0;
+  }
 }
 </style>

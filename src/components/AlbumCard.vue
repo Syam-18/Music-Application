@@ -2,12 +2,6 @@
     <div class="album-card w-[100px] md:w-[180px] shrink-0 h-[100%]" @click="router.push(`/album/${album.id}`)">
       <div class="card-image">
         <img :src="album.images[0]?.url" :alt="album.name" />
-        <div class="play-button" :class="{ show: showPlayButton }">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path
-              d="m7.05 3.606 13.49 7.788a.7.7 0 0 1 0 1.212L7.05 20.394A.7.7 0 0 1 6 19.788V4.212a.7.7 0 0 1 1.05-.606z" />
-          </svg>
-        </div>
       </div>
       <div class="card-content">
         <h3 class="card-title text-sm md:text-[18px] truncate">{{ album.name }}</h3>

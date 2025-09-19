@@ -16,9 +16,9 @@
       </div>
       <div
         class="bg-[hsl(0,0%,10%)] text-white pt-2 pb-2 p-4 rounded hover:bg-[hsl(0,0%,30%)] flex items-center justify-between w-[60vw]"
-        @click="$router.push('/liked-songs')"
+        @click="$router.push('/saved-albums')"
       >
-        <p class="tracking-widest text-lg">Artists</p>
+        <p class="tracking-widest text-lg">Albums</p>
         <div class="playlist-image w-[40px]">
           <div class="heart-icon">❤</div>
         </div>

@@ -96,11 +96,11 @@
               </div>
               <div class="track-actions">
                 <span
-                  class="text-2xl md:text-4xl heart"
+                  class="text-xl md:text-2xl heart"
                   :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
                   @click.stop.prevent="toggleLike({ album: album, ...track })"
                 >
-                  ♥
+                  <i class="fa-solid fa-heart"></i>
                 </span>
                 <span class="track-duration">
                   {{ formatDuration(track.duration_ms) }}

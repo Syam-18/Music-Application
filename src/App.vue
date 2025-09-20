@@ -14,13 +14,13 @@
       </div>
     </div>
     <router-view v-else />
-    <!-- <PlayerBar v-if="!isLoginPage" class="fixed bottom-0 left-0 right-0"/> -->
+    <PlayerBar v-if="!isLoginPage" class="fixed bottom-0 left-0 right-0 z-10"/>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Sidebar from './components/Sidebar.vue'
 import TopBar from './components/TopBar.vue'
 import Footer from './components/Footer.vue'
@@ -29,7 +29,32 @@ import PlayerBar from './components/PlayerBar.vue'
 import AlbumView from './components/AlbumView.vue'
 
 const route = useRoute()
+const router = useRouter()
 const isLoginPage = computed(() => route.name === 'Login')
+const handleKeydown = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    // ignore if user is typing
+    const tag = document.activeElement.tagName
+    if (['INPUT', 'TEXTAREA'].includes(tag)) return;
+
+    e.preventDefault();
+    router.push({ name: 'Search' });
+
+    // optional: focus the search input after navigation
+    setTimeout(() => {
+      const searchInput = document.querySelector('#search-input')
+      if (searchInput) searchInput.focus()
+    }, 50);
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeydown);
+});
 </script>
 
 <style>

@@ -102,3 +102,39 @@ export async function getAlbums() {
   // Return the likedAlbums array, or an empty array if not found
   return snap.exists() ? snap.data().likedAlbums || [] : []
 }
+
+export async function addArtistToArtists(artist) {
+  const user = auth.currentUser
+  if (!user) throw new Error('No authenticated user found')
+
+  const userRef = doc(db, 'users', user.uid)
+
+  // Save full album object
+  // Using a separate field 'likedAlbums' to keep it distinct from 'likedSongs'
+  await setDoc(userRef, { likedArtists: arrayUnion(artist) }, { merge: true })
+}
+
+export async function removeArtistFromArtists(artistId) {
+  const user = auth.currentUser
+  if (!user) throw new Error('No authenticated user found')
+
+  const userRef = doc(db, 'users', user.uid)
+  const snap = await getDoc(userRef)
+  if (!snap.exists()) return // No document or no liked albums to remove
+
+  const likedArtists = snap.data().likedArtists || []
+  // Filter out the album with the matching ID
+  const updatedArtists = likedArtists.filter((a) => a !== artistId)
+
+  await setDoc(userRef, { likedArtists: updatedArtists }, { merge: true })
+}
+
+export async function getArtists() {
+  const user = auth.currentUser
+  if (!user) throw new Error('No authenticated user found')
+
+  const userRef = doc(db, 'users', user.uid)
+  const snap = await getDoc(userRef)
+  // Return the likedAlbums array, or an empty array if not found
+  return snap.exists() ? snap.data().likedArtists || [] : []
+}

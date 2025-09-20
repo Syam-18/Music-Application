@@ -27,7 +27,7 @@
         <span>Albums</span>
       </div>
 
-      <div class="nav-item">
+      <div class="nav-item" @click="$router.push(`/following-artists`)">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
@@ -44,7 +44,7 @@
   background: #000;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid #1a1a1a;
+  border-right: 1px solid hsl(0, 0%, 20%);
   display: none;
   padding:20px;
 }

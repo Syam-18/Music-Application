@@ -116,8 +116,9 @@ const getPopularArtists = async (ids = []) => {
     artists.value.push(artist)
   })
 
-  return artists.value
   isLoading.value=false
+  console.log(artists.value)
+  return artists.value
 }
 
 // ✅ Call it with IDs

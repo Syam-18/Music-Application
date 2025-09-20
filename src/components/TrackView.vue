@@ -1,5 +1,6 @@
 <script setup>
 import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
+import { usePlayerStore } from '@/stores/playerStore'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const router = useRouter()
@@ -7,6 +8,7 @@ const track = ref({})
 const Route = useRoute()
 const likedTracks = ref([])
 const loading = ref(true)
+const playerStore = usePlayerStore()
 
 const genres = ['Funk', 'Electronic music', 'Disco', 'Soft Rock', 'Progressive pop']
 const getAccessToken = async () => {
@@ -76,6 +78,13 @@ const toggleLike = async (track) => {
 
   }
 }
+
+const playCurrentTrack = () => {
+  if(track.value){
+    playerStore.playTrack(track.value)
+  }
+}
+
 onMounted(async () => {
   await getTrack()
   likedTracks.value = await getLikedSongs() // 👈 sync with Firestore
@@ -174,6 +183,7 @@ onMounted(async () => {
         </div>
         <div class="flex md:hidden items-center gap-5 mt-4">
           <div
+            @click="playCurrentTrack"
             class="bg-[hsl(120,50%,50%)] p-4 w-[40px] h-[40px] rounded-full flex items-center justify-center cursor-pointer"
           >
             <i class="fa-solid fa-play text-black"></i>
@@ -183,9 +193,9 @@ onMounted(async () => {
             :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id)}"
             @click="toggleLike(track)"
           >
-            ♥
+            <i class="fa-solid fa-heart"></i>
           </span>
-          <div
+          <!-- <div
             class="border-[hsl(0,0%,50%)] border-2 relative cursor-pointer flex items-center justify-center z-4"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="bg-black">
@@ -199,7 +209,7 @@ onMounted(async () => {
             <div
               class="absolute -top-2 border-[hsl(0,0%,50%)] border-2 text-black inset-0 flex items-center justify-center text-xs z-3"
             ></div>
-          </div>
+          </div> -->
         </div>
         <div class="flex gap-2 flex-wrap md:flex-nowrap">
           <div
@@ -211,18 +221,19 @@ onMounted(async () => {
         </div>
         <div class="items-center gap-5 mt-4 hidden md:flex">
           <div
+          @click="playCurrentTrack"
             class="bg-[hsl(120,50%,50%)] p-4 w-[40px] h-[40px] rounded-full flex items-center justify-center cursor-pointer"
           >
             <i class="fa-solid fa-play text-black"></i>
           </div>
           <span
-            class="heart"
+            class="heart text-xl md:text-2xl"
             :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
             @click="toggleLike(track)"
           >
-            ♥
+            <i class="fa-solid fa-heart"></i>
           </span>
-          <div
+          <!-- <div
             class="border-[hsl(0,0%,50%)] border-2 relative cursor-pointer flex items-center justify-center z-4"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="bg-black">
@@ -236,7 +247,7 @@ onMounted(async () => {
             <div
               class="absolute -top-2 border-[hsl(0,0%,50%)] border-2 text-black inset-0 flex items-center justify-center text-xs z-3"
             ></div>
-          </div>
+          </div> -->
         </div>
         <div class="flex flex-col gap-1">
           <div v-for="artist in track.album.artists" class="hover:underline">
@@ -267,7 +278,6 @@ onMounted(async () => {
 .heart {
   cursor: pointer;
   color: #888;
-  font-size: 32px;
   transition: color 0.2s;
 }
 .heart.liked {

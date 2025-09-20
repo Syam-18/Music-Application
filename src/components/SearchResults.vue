@@ -197,22 +197,7 @@ const getAlbums = async () => {
   <!-- Songs Skeleton -->
   <div class="grow">
     <h1 class="font-semibold text-2xl mb-2">Songs</h1>
-    <div class="flex flex-col gap-1">
-      <div
-        v-for="i in 5"
-        :key="i"
-        class="flex items-center p-2 rounded-md bg-[hsl(0,0%,8%)]"
-      >
-        <!-- Album cover -->
-        <div class="w-10 h-10 bg-gray-700 rounded mr-4"></div>
-        <div class="flex flex-col gap-1">
-          <!-- Song title -->
-          <div class="h-4 w-40 bg-gray-700 rounded"></div>
-          <!-- Small text -->
-          <div class="h-3 w-24 bg-gray-700 rounded"></div>
-        </div>
-      </div>
-    </div>
+    
   </div>
 </div>
 

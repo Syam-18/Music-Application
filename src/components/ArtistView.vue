@@ -1,6 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
+import {
+  likeSong,
+  unlikeSong,
+  getLikedSongs,
+  addArtistToArtists,
+  removeArtistFromArtists,
+  getArtists,
+} from '@/services/musicService'
 import { useRoute } from 'vue-router'
 import AlbumCard from './AlbumCard.vue'
 import CardSkeletonLoading from './CardSkeletonLoading.vue'
@@ -10,39 +17,52 @@ const topTracks = ref([])
 const topAlbums = ref([])
 const Route = useRoute()
 const likedTracks = ref([])
+const followingArtists = ref([])
 const toastMessage = ref('')
+const toastType = ref('')
 
 const showToast = ref(false)
 
-function triggerToast(message) {
+function triggerToast(message, type) {
   toastMessage.value = message
   showToast.value = true
+  toastType.value = type
   setTimeout(() => (showToast.value = false), 2000) // hides after 2s
 }
 
 const isAlbumsLoading = ref(true)
 const isArtistLoading = ref(true)
 
-
+const toggleArtist = async (artistId) => {
+  if (followingArtists.value.includes(artistId)) {
+    followingArtists.value = followingArtists.value.filter((Id) => Id !== artistId)
+    triggerToast('Removed from ', 'artist')
+    await removeArtistFromArtists(artistId)
+  } else {
+    followingArtists.value.push(artistId)
+    triggerToast('Added to ', 'artist')
+    await addArtistToArtists(artistId)
+  }
+}
 
 const toggleLike = async (track) => {
-
   if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
     likedTracks.value = likedTracks.value.filter((likedTrack) => likedTrack.id !== track.id)
-    triggerToast('Removed from liked songs')
+    triggerToast('Removed from ', 'song')
     await unlikeSong(track)
   } else {
     likedTracks.value.push(track)
-    triggerToast('Added to liked songs')
+    triggerToast('Added to ', 'song')
     await likeSong(track)
   }
-
 }
 onMounted(async () => {
   await getArtistById(Route.params.id)
   await getArtistTopTracks(Route.params.id)
   await getArtistAlbums()
   likedTracks.value = await getLikedSongs() // 👈 sync with Firestore
+  followingArtists.value = await getArtists()
+  console.log(followingArtists.value)
 })
 
 const getAccessToken = async () => {
@@ -135,11 +155,10 @@ const getArtistAlbums = async () => {
   isAlbumsLoading.value = false
   // console.log('Artist albums:', data.items) // 🔥 Array of album objects
 }
-
 </script>
 <template>
   <div
-    class="relative flex flex-col items-center bg-[hsl(0,0%,10%)] w-full h-[50vh] animate-pulse "
+    class="relative flex flex-col items-center bg-[hsl(0,0%,10%)] w-full h-[50vh] animate-pulse"
     v-if="isArtistLoading"
   >
     <div class="bottom-0 left-0 absolute p-4">
@@ -159,9 +178,18 @@ const getArtistAlbums = async () => {
       <p class="text-shadow-2xs ml-4 font-semibold text-4xl md:text-6xl" style="margin-bottom: 4px">
         {{ artist.name }}
       </p>
-      <p class="text-shadow-2xs ml-4 text-[hsl(0,0%,80)]">
-        {{ artist.followers.total.toLocaleString() }} followers
-      </p>
+      <div class="flex gap-4">
+        <p class="text-shadow-2xs ml-4 text-[hsl(0,0%,80)]">
+          {{ artist.followers.total.toLocaleString() }} followers
+        </p>
+        <button
+          @click="toggleArtist(artist.id)"
+          class="border-2 border-[hsl(0,0%,70%)] pl-2 pr-2 rounded-md cursor-pointer text-sm"
+          :class="{'bg-[hsl(120,60%,50%)] border-none text-black' : followingArtists.includes(artist.id)}"
+        >
+          {{ followingArtists.includes(artist.id) ? 'Following' : 'Follow' }}
+        </button>
+      </div>
     </div>
     <div class="z-1 absolute inset-0 bg-gradient-to-b from-transparent to-black/60"></div>
     <img
@@ -209,11 +237,11 @@ const getArtistAlbums = async () => {
           </div>
           <div class="track-actions">
             <span
-              class="text-2xl md:text-4xl heart"
+              class="text-xl md:text-2xl heart"
               @click.stop.prevent="toggleLike(track)"
               :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
             >
-              ♥
+              <i class="fa-solid fa-heart"></i>
             </span>
             <span class="track-duration">
               {{ formatDuration(track.duration_ms) }}
@@ -239,7 +267,23 @@ const getArtistAlbums = async () => {
       <AlbumCard v-for="album in topAlbums" :key="album.id" :album="album" />
     </div>
   </section>
-  <div v-if="showToast" class="toast">{{ toastMessage }} <span @click="router.push('/liked-songs')" class="text-blue-400 cursor-pointer">Liked Songs</span></div>
+  <div v-if="showToast" class="toast">
+    {{ toastMessage }}
+    <span
+      v-if="toastType === 'song'"
+      @click="router.push('/liked-songs')"
+      class="text-blue-400 cursor-pointer"
+    >
+      Liked Songs
+    </span>
+    <span
+      v-else-if="toastType === 'artist'"
+      @click="router.push('/following-artists')"
+      class="text-blue-400 cursor-pointer"
+    >
+      Artists
+    </span>
+  </div>
 </template>
 
 <style scoped>
@@ -258,8 +302,8 @@ const getArtistAlbums = async () => {
 }
 
 @media screen and (max-width: 768px) {
-  .toast{
-    left:0;
+  .toast {
+    left: 0;
     bottom: 3rem;
   }
 }

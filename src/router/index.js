@@ -14,6 +14,11 @@ import ArtistView from "@/components/ArtistView.vue";
 import SearchResults from "@/components/SearchResults.vue";
 import LibraryMobile from "@/components/LibraryMobile.vue";
 import Albums from "@/views/Albums.vue";
+import PlaylistView from "@/components/PlaylistView.vue";
+import BrowseView from "@/components/BrowseView.vue";
+import CategoryView from "@/components/CategoryView.vue";
+import Discover from "@/views/Discover.vue";
+import Artists from "@/views/Artists.vue";
 
 
 const routes = [
@@ -26,7 +31,7 @@ const routes = [
   {
     path: '/search',
     name: 'Search',
-    component: Search,
+    component: Discover,
     meta: { requiresAuth: true },
   },
   {
@@ -78,7 +83,7 @@ const routes = [
   {
     path: '/library',
     name: 'Library',
-    component:LibraryMobile,
+    component: LibraryMobile,
   },
   {
     path: '/:pathMatch(.*)*',
@@ -89,6 +94,33 @@ const routes = [
     path: '/saved-albums',
     name: 'Saved Albums',
     component: Albums,
+  },
+  {
+    path: '/',
+    name: 'Browse',
+    component: BrowseView,
+  },
+  {
+    path: '/category/:categoryName',
+    name: 'Category',
+    component: CategoryView,
+    props: true,
+  },
+  {
+    path: '/playlistview/:playlistId',
+    name: 'Playlistview',
+    component: PlaylistView,
+    props: true,
+  },
+  {
+    path: '/discover',
+    name: 'Discover',
+    component: Discover,
+  },
+  {
+    path: '/following-artists',
+    name : "Following Artists",
+    component: Artists,
   }
 ]
 
@@ -114,5 +146,21 @@ router.afterEach(() => {
     container.scrollTo({ top: 0, behavior: 'smooth' }) // smooth scroll like Spotify
   }
 })
+
+router.beforeEach((to, from) => {
+  const isLoggedIn = true // replace with your auth check
+
+  if (to.name === 'Login' && isLoggedIn) {
+    alert('already logged in')
+
+    // if from is valid and different from login, go back; else fallback to Home
+    if (from.name && from.name !== 'Login') {
+      return { path: from.fullPath }
+    } else {
+      return { name: 'Home' }
+    }
+  }
+})
+
 
 export default router;

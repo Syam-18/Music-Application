@@ -34,14 +34,14 @@
         <i class="fa-solid fa-house"></i>
         Home
       </button>
-      <!-- <button
+      <button
         class="center-nav-btn"
-        :class="{ active: $route.name === 'Search' }"
+        :class="{ active: $route.name === 'Discover' }"
         @click="router.push('/discover')"
       >
         <i class="fa-solid fa-magnifying-glass mr-2"></i>
         Discover
-      </button> -->
+      </button>
     </div>
 
     <div class="search-container" >
@@ -49,9 +49,10 @@
         <i class="fa-solid fa-magnifying-glass search-icon mr-auto"></i>
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Search... [ CTRL + K ]"
           @click="changeSearchPath"
           v-model="searchQuery"
+          id="search-input"
         />
       </div>
     </div>
@@ -191,7 +192,7 @@ const logout = () => {
   padding: 16px 24px;
   background: rgba(0, 0, 0, 0.9);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid hsl(0, 0%, 20%);
 }
 
 @media screen and (max-width: 768px) {
@@ -251,6 +252,17 @@ const logout = () => {
   font-size: 14px;
   font-weight: 600;
   transition: all 0.2s;
+}
+
+@media screen and (max-width: 1000px) {
+  .center-nav-btn {
+    padding: 6px 4px;
+    font-size: 13px;
+    /* border-radius: 10px; */
+  }
+  .center-nav-btn i{
+    display: none;
+  }
 }
 
 .center-nav-btn.active {

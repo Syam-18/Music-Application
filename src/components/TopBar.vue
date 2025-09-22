@@ -1,62 +1,71 @@
 <template>
   <div class="topbar lg:w-[85vw] md:w-[75vw] mt-2 md:mt-0" v-if="showTopbar">
     <button class="nav-btn md:hidden flex items-center justify-center" @click="$router.go(-1)">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
-          />
-        </svg>
-      </button>
-    <div class="flex items-center">
-    <div class="nav-buttons mr-4 hidden md:flex">
-      <button class="nav-btn hidden md:flex" @click="$router.go(-1)">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
-          />
-        </svg>
-      </button>
-      <button class="nav-btn hidden md:flex" @click="$router.go(+1)">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path
-            d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8l-6.47 6.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"
-          />
-        </svg>
-      </button>
-    </div>
-
-    <div class="center-nav ml-4 hidden md:flex">
-      <button
-        class="center-nav-btn hover:bg-[hsl(0,0%,80%)] hidden md:flex"
-        :class="{ active: $route.name === 'Home' }"
-        @click="$router.push('/')"
-      >
-        <i class="fa-solid fa-house"></i>
-        Home
-      </button>
-      <button
-        class="center-nav-btn"
-        :class="{ active: $route.name === 'Discover' }"
-        @click="router.push('/discover')"
-      >
-        <i class="fa-solid fa-magnifying-glass mr-2"></i>
-        Discover
-      </button>
-    </div>
-
-    <div class="search-container" >
-      <div class="search-box">
-        <i class="fa-solid fa-magnifying-glass search-icon mr-auto"></i>
-        <input
-          type="text"
-          placeholder="Search... [ CTRL + K ]"
-          @click="changeSearchPath"
-          v-model="searchQuery"
-          id="search-input"
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path
+          d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
         />
+      </svg>
+    </button>
+    <div class="flex items-center">
+      <div class="nav-buttons mr-4 hidden md:flex">
+        <button class="nav-btn hidden md:flex" @click="$router.go(-1)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"
+            />
+          </svg>
+        </button>
+        <button class="nav-btn hidden md:flex" @click="$router.go(+1)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path
+              d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8l-6.47 6.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="center-nav ml-4 hidden md:flex">
+        <button
+          class="center-nav-btn hover:bg-[hsl(0,0%,80%)] hidden md:flex"
+          :class="{ active: $route.name === 'Home' }"
+          @click="$router.push('/')"
+        >
+          <i class="fa-solid fa-house"></i>
+          Home
+        </button>
+        <button
+          class="center-nav-btn"
+          :class="{ active: $route.name === 'Discover' }"
+          @click="router.push('/discover')"
+        >
+          <i class="fa-solid fa-magnifying-glass mr-2"></i>
+          Discover
+        </button>
+      </div>
+
+      <div class="search-container">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass search-icon mr-auto"></i>
+          <input
+            type="text"
+            placeholder="Search... [ CTRL + K ]"
+            @click="changeSearchPath"
+            v-model="searchQuery"
+            id="search-input"
+            class="hidden md:block"
+          />
+          <input
+            type="text"
+            placeholder="Search... "
+            @click="changeSearchPath"
+            v-model="searchQuery"
+            id="search-input"
+            class="md:hidden"
+          />
+        </div>
       </div>
     </div>
-  </div>
 
     <div class="user-controls hidden md:flex">
       <div class="profile" v-if="store.user" @click="showUserMenu = !showUserMenu">
@@ -111,15 +120,17 @@ onMounted(() => {
   }
 })
 
-
 const showTopbar = computed(() => {
-  if(window.innerWidth > 768){
+  if (window.innerWidth > 768) {
     return true
   }
-  if(window.innerWidth <= 768 && (route.name === 'TrackView' || route.name === 'AlbumView' || route.name === 'ArtistView')){
+  if (
+    window.innerWidth <= 768 &&
+    (route.name === 'TrackView' || route.name === 'AlbumView' || route.name === 'ArtistView')
+  ) {
     return true
   }
-  return ((route.name === 'Search' || route.name === 'SearchResults'))
+  return route.name === 'Search' || route.name === 'SearchResults'
 })
 
 const changeSearchPath = () => {
@@ -180,8 +191,6 @@ const logout = () => {
   showUserMenu.value = false
   router.push('/login')
 }
-
-
 </script>
 
 <style scoped>
@@ -221,7 +230,7 @@ const logout = () => {
   .nav-btn {
     width: 28px;
     height: 28px;
-    margin-right:10px;
+    margin-right: 10px;
   }
 }
 
@@ -236,7 +245,7 @@ const logout = () => {
 
 .center-nav {
   gap: 8px;
-  margin-right:20px;
+  margin-right: 20px;
 }
 
 .center-nav-btn {
@@ -260,13 +269,13 @@ const logout = () => {
     font-size: 13px;
     /* border-radius: 10px; */
   }
-  .center-nav-btn i{
+  .center-nav-btn i {
     display: none;
   }
 }
 
 .center-nav-btn.active {
-  background:hsl(0, 0%, 20%);
+  background: hsl(0, 0%, 20%);
   color: white;
 }
 
@@ -275,7 +284,6 @@ const logout = () => {
 }
 
 .search-container {
-
 }
 
 .search-box {

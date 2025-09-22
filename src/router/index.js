@@ -1,25 +1,24 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory } from 'vue-router'
 // import { useAuthStore } from "@/stores/auth"; // ✅ make sure this exists
 
 // Views
-import Home from "@/views/Home.vue";
-import Search from "@/views/Search.vue";
-import LikedSongs from "@/views/LikedSongs.vue";
-import Login from "@/views/Login.vue";
-import Playlist from "@/views/Albums.vue";
+import Home from '@/views/Home.vue'
+import Search from '@/views/Search.vue'
+import LikedSongs from '@/views/LikedSongs.vue'
+import Login from '@/views/Login.vue'
+import Playlist from '@/views/Albums.vue'
 
 // Components
-import TrackView from "@/components/TrackView.vue";
-import ArtistView from "@/components/ArtistView.vue";
-import SearchResults from "@/components/SearchResults.vue";
-import LibraryMobile from "@/components/LibraryMobile.vue";
-import Albums from "@/views/Albums.vue";
-import PlaylistView from "@/components/PlaylistView.vue";
-import BrowseView from "@/components/BrowseView.vue";
-import CategoryView from "@/components/CategoryView.vue";
-import Discover from "@/views/Discover.vue";
-import Artists from "@/views/Artists.vue";
-
+import TrackView from '@/components/TrackView.vue'
+import ArtistView from '@/components/ArtistView.vue'
+import SearchResults from '@/components/SearchResults.vue'
+import LibraryMobile from '@/components/LibraryMobile.vue'
+import Albums from '@/views/Albums.vue'
+import PlaylistView from '@/components/PlaylistView.vue'
+import BrowseView from '@/components/BrowseView.vue'
+import CategoryView from '@/components/CategoryView.vue'
+import Discover from '@/views/Discover.vue'
+import Artists from '@/views/Artists.vue'
 
 const routes = [
   {
@@ -119,15 +118,21 @@ const routes = [
   },
   {
     path: '/following-artists',
-    name : "Following Artists",
+    name: 'Following Artists',
     component: Artists,
-  }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: () => import('@/views/Profile.vue'),
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-});
+})
 
 // // ✅ Auth Guard
 // router.beforeEach((to, from, next) => {
@@ -147,20 +152,4 @@ router.afterEach(() => {
   }
 })
 
-router.beforeEach((to, from) => {
-  const isLoggedIn = true // replace with your auth check
-
-  if (to.name === 'Login' && isLoggedIn) {
-    alert('already logged in')
-
-    // if from is valid and different from login, go back; else fallback to Home
-    if (from.name && from.name !== 'Login') {
-      return { path: from.fullPath }
-    } else {
-      return { name: 'Home' }
-    }
-  }
-})
-
-
-export default router;
+export default router

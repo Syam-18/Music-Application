@@ -283,9 +283,6 @@ const logout = () => {
   color: #fff;
 }
 
-.search-container {
-}
-
 .search-box {
   position: relative;
   display: flex;

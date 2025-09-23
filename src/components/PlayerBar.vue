@@ -53,18 +53,14 @@ function msToMinSec(ms) {
 }
 
 const toggleLike = async (track) => {
-
   if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
-    likedTracks.value = likedTracks.value.filter(
-      (likedTrack) => likedTrack.id !== track.id
-    )
+    likedTracks.value = likedTracks.value.filter((likedTrack) => likedTrack.id !== track.id)
     triggerToast('Removed from ')
     await unlikeSong(track)
   } else {
     likedTracks.value.push(track)
     triggerToast('Added to ')
     await likeSong(track)
-
   }
 }
 
@@ -113,19 +109,10 @@ onUnmounted(() => {
             playerStore.currentTrack?.album?.name || 'Unknown Album'
           }}</span>
         </div>
-        <div class="player-actions">
-          <span
-            class="heart"
-            :class="{ liked: likedTracks.includes(playerStore.currentTrack?.id) }"
-            @click="toggleLike(playerStore.currentTrack?.id)"
-          >
-            <i class="fa-solid fa-heart"></i>
-          </span>
-        </div>
       </div>
     </div>
 
-    <div class="player-center">
+    <div class="player-center hidden md:flex">
       <div class="control-buttons">
         <button class="control-btn prev-btn">
           <i class="fa-solid fa-backward"></i>
@@ -152,7 +139,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="player-right">
+    <div class="player-right hidden md:flex">
       <div class="volume-controls">
         <button class="control-btn volume-btn">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
@@ -180,6 +167,14 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.hide-in-mobile {
+  display: hidden;
+}
+@media screen and (min-width: 768px) {
+  .hide-in-mobile {
+    display: block;
+  }
+}
 .player-bar {
   height: 100px;
   background: #181818;
@@ -244,7 +239,6 @@ input[type='range'] {
 }
 
 .player-actions {
-  display: flex;
   align-items: center;
 }
 
@@ -277,7 +271,6 @@ input[type='range'] {
 }
 
 .player-center {
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -300,7 +293,6 @@ input[type='range'] {
   color: #b3b3b3;
   cursor: pointer;
   border-radius: 50%;
-  display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
@@ -374,7 +366,6 @@ input[type='range'] {
 }
 
 .player-right {
-  display: flex;
   align-items: center;
   width: 30%;
   min-width: 180px;

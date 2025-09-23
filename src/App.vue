@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div v-if="!isLoginPage" class="flex h-screen">
-      <Sidebar class="w-[100px]"/>
+      <Sidebar class="w-[100px]" />
 
       <div class="flex flex-col grow">
         <TopBar class="sticky top-0 z-10" />
@@ -14,7 +14,7 @@
       </div>
     </div>
     <router-view v-else />
-    <PlayerBar v-if="!isLoginPage" class="fixed bottom-0 left-0 right-0 z-10"/>
+    <PlayerBar v-if="!isLoginPage" class="fixed left-0 right-0 z-10 player-bar" />
   </div>
 </template>
 
@@ -35,29 +35,38 @@ const handleKeydown = (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     // ignore if user is typing
     const tag = document.activeElement.tagName
-    if (['INPUT', 'TEXTAREA'].includes(tag)) return;
+    if (['INPUT', 'TEXTAREA'].includes(tag)) return
 
-    e.preventDefault();
-    router.push({ name: 'Search' });
+    e.preventDefault()
+    router.push({ name: 'Search' })
 
     // optional: focus the search input after navigation
     setTimeout(() => {
       const searchInput = document.querySelector('#search-input')
       if (searchInput) searchInput.focus()
-    }, 50);
+    }, 50)
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown);
-});
+  window.addEventListener('keydown', handleKeydown)
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown);
-});
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <style>
+.player-bar {
+  bottom: 0px;
+}
+
+@media screen and (max-width: 768px) {
+  .player-bar {
+    bottom: 56px;
+  }
+}
 * {
   margin: 0;
   padding: 0;

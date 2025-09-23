@@ -361,7 +361,7 @@ const handleCategoryClick = (category) => {
           @click="handleCategoryClick(category)"
         >
           <h3
-            class="text-3xl font-bold text-white relative z-10 leading-tight drop-shadow-md max-[768px]:text-2xl max-[480px]:text-lg"
+            class="text-3xl font-bold text-white relative leading-tight drop-shadow-md max-[768px]:text-2xl max-[480px]:text-lg"
           >
             {{ category.name }}
           </h3>
@@ -390,7 +390,7 @@ const handleCategoryClick = (category) => {
           @click="handleCategoryClick(category)"
         >
           <h3
-            class="text-2xl font-bold text-white relative z-10 leading-tight drop-shadow-md max-[768px]:text-lg max-[480px]:text-base"
+            class="text-2xl font-bold text-white relative leading-tight drop-shadow-md max-[768px]:text-lg max-[480px]:text-base"
           >
             {{ category.name }}
           </h3>

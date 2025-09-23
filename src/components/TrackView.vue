@@ -62,25 +62,20 @@ function triggerToast(message) {
   setTimeout(() => (showToast.value = false), 2000) // hides after 2s
 }
 
-
 const toggleLike = async (track) => {
-
   if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
-    likedTracks.value = likedTracks.value.filter(
-      (likedTrack) => likedTrack.id !== track.id
-    )
+    likedTracks.value = likedTracks.value.filter((likedTrack) => likedTrack.id !== track.id)
     triggerToast('Removed from ')
     await unlikeSong(track)
   } else {
     likedTracks.value.push(track)
     triggerToast('Added to ')
     await likeSong(track)
-
   }
 }
 
 const playCurrentTrack = () => {
-  if(track.value){
+  if (track.value) {
     playerStore.playTrack(track.value)
   }
 }
@@ -92,7 +87,10 @@ onMounted(async () => {
 </script>
 <template>
   <!-- Skeleton Loader -->
-  <div v-if="loading" class="p-4 w-full h-full flex flex-col items-center bg-[hsl(0,0%,10%)] min-h-[150vh]">
+  <div
+    v-if="loading"
+    class="p-4 w-full h-full flex flex-col items-center bg-[hsl(0,0%,10%)] min-h-[150vh]"
+  >
     <div
       class="rounded-2xl w-[90vw] md:w-[20vw] h-[40vh] animate-pulse bg-[hsl(0,0%,20%)] mb-8 mt-4 hidden md:block"
     ></div>
@@ -143,7 +141,7 @@ onMounted(async () => {
       <div class="flex flex-col gap-5 self-start">
         <h1 class="text-3xl md:text-6xl song-name">{{ track.name }}</h1>
         <div class="flex items-center gap-2 md:gap-4 flex-wrap">
-          <div class="flex gap-2 mr-2 md:mr-4" style="margin-right:20px;">
+          <div class="flex gap-2 mr-2 md:mr-4" style="margin-right: 20px">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" class="hidden md:flex">
               <circle cx="8" cy="7" r="2" stroke="#B0B0B0" stroke-width="1.5" />
               <path
@@ -166,11 +164,16 @@ onMounted(async () => {
               {{ track.album.artists[0].name }}
             </p>
           </div>
-          <div class="flex gap-2 mr-2 md:mr-4 items-center" style="margin-right:20px;">
+          <div class="flex gap-2 mr-2 md:mr-4 items-center" style="margin-right: 20px">
             <div class="w-5 h-5 rounded-full border-1 flex justify-center items-center">
               <div class="w-3 h-3 rounded-full border-2"></div>
             </div>
-            <p class="text-xs md:text-[16px] cursor-pointer" @click.stop="router.push(`/album/${track.album.id}`)">{{ track.album.name }}</p>
+            <p
+              class="text-xs md:text-[16px] cursor-pointer"
+              @click.stop="router.push(`/album/${track.album.id}`)"
+            >
+              {{ track.album.name }}
+            </p>
           </div>
           <p class="mr-2 md:mr-4 text-xs md:text-[16px]">
             {{ track.album.release_date.slice(0, 4) }}
@@ -189,8 +192,8 @@ onMounted(async () => {
             <i class="fa-solid fa-play text-black"></i>
           </div>
           <span
-            class="heart "
-            :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id)}"
+            class="heart"
+            :class="{ liked: likedTracks.some((likedTrack) => likedTrack.id === track.id) }"
             @click="toggleLike(track)"
           >
             <i class="fa-solid fa-heart"></i>
@@ -214,6 +217,7 @@ onMounted(async () => {
         <div class="flex gap-2 flex-wrap md:flex-nowrap">
           <div
             v-for="genre in genres"
+            :key="genre"
             class="border-[hsl(0,0%,50%)] border-2 rounded-3xl px-4py-2 self-start"
           >
             <p class="text-xs md:text-[16px]">{{ genre }}</p>
@@ -221,7 +225,7 @@ onMounted(async () => {
         </div>
         <div class="items-center gap-5 mt-4 hidden md:flex">
           <div
-          @click="playCurrentTrack"
+            @click="playCurrentTrack"
             class="bg-[hsl(120,50%,50%)] p-4 w-[40px] h-[40px] rounded-full flex items-center justify-center cursor-pointer"
           >
             <i class="fa-solid fa-play text-black"></i>
@@ -250,7 +254,7 @@ onMounted(async () => {
           </div> -->
         </div>
         <div class="flex flex-col gap-1">
-          <div v-for="artist in track.album.artists" class="hover:underline">
+          <div v-for="artist in track.album.artists" :key="artist.id" class="hover:underline">
             <RouterLink :to="`/artist/${artist.id}`">
               <p class="text-lg font-semibold w-[200px]">{{ artist.name }}</p>
             </RouterLink>
@@ -259,8 +263,12 @@ onMounted(async () => {
       </div>
     </div>
   </div>
-  <div v-if="showToast" class="toast">{{ toastMessage }} <span @click="router.push('/liked-songs')" class="text-blue-400 cursor-pointer">Liked Songs</span></div>
-
+  <div v-if="showToast" class="toast">
+    {{ toastMessage }}
+    <span @click="router.push('/liked-songs')" class="text-blue-400 cursor-pointer"
+      >Liked Songs</span
+    >
+  </div>
 </template>
 <style scoped>
 .p-8 {
@@ -291,7 +299,7 @@ onMounted(async () => {
   color: hsl(0, 0%, 10%);
   padding: 5px 10px;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   opacity: 0.95;
   transition: all 0.3s ease;

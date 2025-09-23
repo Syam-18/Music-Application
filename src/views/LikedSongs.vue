@@ -65,7 +65,7 @@
               class="w-4 h-4"
             />
             <div class="song-info">
-              <span class="song-title text-sm truncate w-[27vw]">{{ song.name }}</span>
+              <span class="song-title text-sm truncate w-[20vw]">{{ song.name }}</span>
               <span
                 class="song-artist hover:underline text-xs"
                 @click.stop="router.push(`/artist/${song.album.artists[0].id}`)"
@@ -146,21 +146,20 @@ function triggerToast(message, type) {
 }
 
 async function toggleLike(song) {
+  const isLiked = liked.value.some((likedSong) => likedSong.id === song.id)
 
-    const isLiked = liked.value.some((likedSong) => likedSong.id === song.id)
+  if (isLiked) {
+    triggerToast('Removed from ', 'song')
+    liked.value = liked.value.filter((likedSong) => likedSong.id !== song.id)
+    await unlikeSong(song)
+  } else {
+    triggerToast('Added to ', 'song')
+    liked.value = [...liked.value, song]
+    await likeSong(song)
+  }
 
-    if (isLiked) {
-      triggerToast('Removed from ', 'song')
-      liked.value = liked.value.filter((likedSong) => likedSong.id !== song.id)
-      await unlikeSong(song)
-    } else {
-      triggerToast('Added to ', 'song')
-      liked.value = [...liked.value, song] 
-      await likeSong(song)
-    }
-
-    // Refresh liked list
-    liked.value = await getLikedSongs()
+  // Refresh liked list
+  liked.value = await getLikedSongs()
 }
 
 function playAll() {
@@ -293,6 +292,9 @@ function playSong(song) {
   .table-header {
     grid-template-columns: 15px 1fr 100px;
     padding: 0.5rem 5px;
+  }
+  .track-number {
+    display: hidden;
   }
 }
 .songs-list {

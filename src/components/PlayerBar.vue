@@ -1,13 +1,13 @@
 <script setup>
 import { ref, watch, onUnmounted } from 'vue'
 import { usePlayerStore } from '@/stores/playerStore'
-import cradles from '@/assets/cradles.mp3'
+import ddlj from '@/assets/ddlj.mp3'
 
 const playerStore = usePlayerStore()
 const likedTracks = ref([])
 const currentTime = ref(0)
 let progressInterval = null
-const audio = new Audio(cradles) // Placeholder audio file
+const audio = new Audio(ddlj) // Placeholder audio file
 audio.preload = 'auto'
 audio.volume = 1.0
 
@@ -142,7 +142,7 @@ onUnmounted(() => {
           v-model="currentTime"
           @input="audio.currentTime = currentTime / 1000"
         />
-        <span class="time total-time">{{ msToMinSec(playerStore.currentTrack?.duration_ms) }}</span>
+        <span class="time total-time">{{ msToMinSec(315000) }}</span>
       </div>
     </div>
 

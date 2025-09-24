@@ -1,14 +1,15 @@
 <script setup>
 import { ref, watch, onUnmounted } from 'vue'
 import { usePlayerStore } from '@/stores/playerStore'
-import songFile from '@/assets/cradles.mp3'
+import cradles from '@/assets/cradles.mp3'
 
 const playerStore = usePlayerStore()
 const likedTracks = ref([])
 const currentTime = ref(0)
 let progressInterval = null
-const audio = new Audio(songFile) // Placeholder audio file
+const audio = new Audio(cradles) // Placeholder audio file
 audio.preload = 'auto'
+audio.volume = 1.0
 
 watch(
   () => playerStore.currentTrack,

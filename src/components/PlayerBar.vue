@@ -1,12 +1,14 @@
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { likeSong, unlikeSong } from '@/services/musicService'
+import { ref, watch, onUnmounted } from 'vue'
 import { usePlayerStore } from '@/stores/playerStore'
+import songFile from '@/assets/cradles.mp3'
 
 const playerStore = usePlayerStore()
 const likedTracks = ref([])
 const currentTime = ref(0)
 let progressInterval = null
+const audio = new Audio(songFile) // Placeholder audio file
+audio.preload = 'auto'
 
 watch(
   () => playerStore.currentTrack,
@@ -37,10 +39,12 @@ watch(
 
 const togglePlayBack = () => {
   playerStore.togglePlayPause()
-  if (playerStore.isPlaying) {
-    console.log('Playback started')
+  if (audio.paused) {
+    audio.play()
+    playerStore.isPlaying = true
   } else {
-    console.log('Playback paused')
+    audio.pause()
+    playerStore.isPlaying = false
   }
 }
 
@@ -50,18 +54,6 @@ function msToMinSec(ms) {
   let minutes = Math.floor(totalSeconds / 60)
   let seconds = totalSeconds % 60
   return `${minutes}:${String(seconds).padStart(2, '0')}`
-}
-
-const toggleLike = async (track) => {
-  if (likedTracks.value.some((likedTrack) => likedTrack.id === track.id)) {
-    likedTracks.value = likedTracks.value.filter((likedTrack) => likedTrack.id !== track.id)
-    triggerToast('Removed from ')
-    await unlikeSong(track)
-  } else {
-    likedTracks.value.push(track)
-    triggerToast('Added to ')
-    await likeSong(track)
-  }
 }
 
 function startProgress() {
@@ -75,6 +67,17 @@ function startProgress() {
   }, 1000)
 }
 
+audio.addEventListener('timeupdate', () => {
+  currentTime.value = audio.currentTime * 1000 // convert seconds to ms
+})
+
+// Update duration in currentTrack when audio metadata loads
+audio.addEventListener('loadedmetadata', () => {
+  if (playerStore.currentTrack) {
+    playerStore.currentTrack.duration_ms = audio.duration * 1000
+  }
+})
+
 function stopProgress() {
   if (progressInterval) {
     clearInterval(progressInterval)
@@ -83,6 +86,8 @@ function stopProgress() {
 }
 
 onUnmounted(() => {
+  audio.pause()
+  audio.currentTime = 0
   stopProgress()
 })
 </script>
@@ -134,6 +139,7 @@ onUnmounted(() => {
           :max="playerStore.currentTrack?.duration_ms || 0"
           step="1000"
           v-model="currentTime"
+          @input="audio.currentTime = currentTime / 1000"
         />
         <span class="time total-time">{{ msToMinSec(playerStore.currentTrack?.duration_ms) }}</span>
       </div>

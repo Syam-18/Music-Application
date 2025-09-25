@@ -8,7 +8,7 @@
         <NavBarMobile class="fixed bottom-0 left-0 right-0 z-10" />
 
         <div class="grow overflow-auto hide-scrollbar" id="main-scroll">
-          <router-view class="min-h-[150vh]" />
+          <router-view />
           <Footer />
         </div>
       </div>

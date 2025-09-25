@@ -39,7 +39,7 @@
           :class="{ active: $route.name === 'Discover' }"
           @click="router.push('/discover')"
         >
-          <i class="fa-solid fa-magnifying-glass mr-2"></i>
+          <i class="fa-solid fa-star-of-life mr-2"></i>
           Discover
         </button>
       </div>
@@ -75,6 +75,11 @@
 
       <div v-if="showUserMenu" class="user-menu items-end">
         <div class="user-menu-item" @click="logout">Logout</div>
+      </div>
+      <div class="user-controls ml-4">
+        <button class="control-btn" @click="$router.push('/profile')">
+          <i class="fa-solid fa-user"></i>
+        </button>
       </div>
     </div>
   </div>

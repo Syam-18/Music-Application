@@ -1,15 +1,60 @@
 <script setup>
-import { ref, watch, onUnmounted } from 'vue'
+import { ref, watch, onUnmounted, onMounted, onBeforeUnmount } from 'vue'
 import { usePlayerStore } from '@/stores/playerStore'
 import ddlj from '@/assets/ddlj.mp3'
 
 const playerStore = usePlayerStore()
-const likedTracks = ref([])
 const currentTime = ref(0)
 let progressInterval = null
 const audio = new Audio(ddlj) // Placeholder audio file
 audio.preload = 'auto'
-audio.volume = 1.0
+
+const volume = ref(50)
+audio.volume = volume.value / 100
+
+const track = ref(null)
+
+let isDragging = false
+
+function updateVolume(clientX) {
+  if (!track.value) return
+  const rect = track.value.getBoundingClientRect()
+  let offsetX = clientX - rect.left
+  let pct = Math.max(0, Math.min(offsetX / rect.width, 1))
+  volume.value = Math.round(pct * 100) // reactive
+  audio.volume = pct // sets actual audio volume
+}
+
+function onMouseMove(e) {
+  if (isDragging) updateVolume(e.clientX)
+}
+function onMouseUp() {
+  isDragging = false
+}
+function onTrackClick(e) {
+  updateVolume(e.clientX)
+}
+
+window.addEventListener('mousemove', (e) => {
+  if (isDragging) {
+    updateVolume(e.clientX)
+  }
+})
+
+window.addEventListener('mouseup', () => {
+  isDragging = false
+})
+
+// Allow clicking on track
+
+onMounted(() => {
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+})
 
 watch(
   () => playerStore.currentTrack,
@@ -118,7 +163,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="player-center hidden md:flex">
+    <div class="player-center">
       <div class="control-buttons">
         <button class="control-btn prev-btn">
           <i class="fa-solid fa-backward"></i>
@@ -149,25 +194,18 @@ onUnmounted(() => {
     <div class="player-right hidden md:flex">
       <div class="volume-controls">
         <button class="control-btn volume-btn">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path
-              d="M10.717 3.55A.5.5 0 0111 4v8a.5.5 0 01-.812.39L6.825 10.5H5.5A2.5 2.5 0 013 8V7a2.5 2.5 0 012.5-2.5h1.325l3.363-1.89a.5.5 0 01.529-.06z"
-            />
-          </svg>
+          <i class="fa-solid fa-volume-high"></i>
         </button>
         <div class="volume-slider">
-          <div class="volume-track">
-            <div class="volume-fill" style="width: 70%"></div>
-            <div class="volume-handle"></div>
+          <div class="volume-track" ref="track" @click="onTrackClick">
+            <div class="volume-fill" :style="{ width: volume + '%' }"></div>
+            <div
+              class="volume-handle"
+              :style="{ left: volume + '%' }"
+              @mousedown="isDragging = true"
+            ></div>
           </div>
         </div>
-        <button class="control-btn fullscreen-btn">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-            <path
-              d="M1.5 1a.5.5 0 00-.5.5v4a.5.5 0 01-1 0v-4A1.5 1.5 0 011.5 0h4a.5.5 0 010 1h-4zM10 .5a.5.5 0 01.5-.5h4A1.5 1.5 0 0116 1.5v4a.5.5 0 01-1 0v-4a.5.5 0 00-.5-.5h-4a.5.5 0 01-.5-.5zM.5 10a.5.5 0 01.5.5v4a.5.5 0 00.5.5h4a.5.5 0 010 1h-4A1.5 1.5 0 010 14.5v-4a.5.5 0 01.5-.5zm15 0a.5.5 0 01.5.5v4a1.5 1.5 0 01-1.5 1.5h-4a.5.5 0 010-1h4a.5.5 0 00.5-.5v-4a.5.5 0 01.5-.5z"
-            />
-          </svg>
-        </button>
       </div>
     </div>
   </div>
@@ -278,6 +316,7 @@ input[type='range'] {
 }
 
 .player-center {
+  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -332,46 +371,6 @@ input[type='range'] {
   text-align: center;
 }
 
-.progress-bar {
-  flex: 1;
-  height: 12px;
-  display: flex;
-  align-items: center;
-}
-
-.progress-track {
-  width: 100%;
-  height: 4px;
-  background: #4f4f4f;
-  border-radius: 2px;
-  position: relative;
-  cursor: pointer;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #fff;
-  border-radius: 2px;
-  position: relative;
-}
-
-.progress-handle {
-  width: 12px;
-  height: 12px;
-  background: #fff;
-  border-radius: 50%;
-  position: absolute;
-  right: -6px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.progress-bar:hover .progress-handle {
-  opacity: 1;
-}
-
 .player-right {
   align-items: center;
   width: 30%;
@@ -423,5 +422,37 @@ input[type='range'] {
 
 .volume-slider:hover .volume-handle {
   opacity: 1;
+}
+
+.volume-slider {
+  width: 200px;
+  height: 10px;
+  position: relative;
+  cursor: pointer;
+}
+
+.volume-track {
+  background: #ddd;
+  height: 6px;
+  border-radius: 3px;
+  position: relative;
+}
+
+.volume-fill {
+  background: #3b82f6; /* Tailwind blue-500 */
+  height: 6px;
+  border-radius: 3px;
+  width: 50%;
+}
+
+.volume-handle {
+  width: 14px;
+  height: 14px;
+  background: #3b82f6;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>

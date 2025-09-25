@@ -3,11 +3,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 // Views
 import Home from '@/views/Home.vue'
-import Search from '@/views/Search.vue'
 import LikedSongs from '@/views/LikedSongs.vue'
 import Login from '@/views/Login.vue'
 import Playlist from '@/views/Albums.vue'
-
+import Profile from '@/views/Profile.vue'
 // Components
 import TrackView from '@/components/TrackView.vue'
 import ArtistView from '@/components/ArtistView.vue'
@@ -124,7 +123,7 @@ const routes = [
   {
     path: '/profile',
     name: 'Profile',
-    component: () => import('@/views/Profile.vue'),
+    component: Profile,
     meta: { requiresAuth: true },
   },
 ]

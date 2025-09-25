@@ -86,7 +86,7 @@ const getPopularArtists = async () => {
 </script>
 
 <template>
-  <section class="section p-4">
+  <section class="section p-4 min-h-[150vh]">
     <div class="section-header">
       <h2>Favourite Artists</h2>
     </div>
@@ -98,10 +98,10 @@ const getPopularArtists = async () => {
         v-for="artist in popularArtists"
         :key="artist.id"
         :artist="{
-            id: artist.id,
-            name: artist.name,
-            image: artist.images[0]?.url, // ✅ use Spotify image
-          }"
+          id: artist.id,
+          name: artist.name,
+          image: artist.images[0]?.url, // ✅ use Spotify image
+        }"
       />
     </div>
   </section>

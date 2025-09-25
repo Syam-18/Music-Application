@@ -58,8 +58,6 @@ const getAccessToken = async () => {
   return data.access_token
 }
 
-
-
 const popularAlbums = ref([])
 
 const getPopularAlbums = async () => {
@@ -84,27 +82,18 @@ const getPopularAlbums = async () => {
   popularAlbums.value = allPopularAlbums
   console.log('Final popular albums list:', popularAlbums.value)
   isAlbumsLoading.value = false
-
 }
-
 </script>
 
 <template>
-
-  <section class="section p-4">
+  <section class="section p-4 min-h-[150vh]">
     <div class="section-header">
       <h2>Saved Albums</h2>
     </div>
-    <div
-      v-if="isAlbumsLoading"
-      class="md:gap-4 flex flex-wrap flex-row w-[100%]"
-    >
+    <div v-if="isAlbumsLoading" class="md:gap-4 flex flex-wrap flex-row w-[100%]">
       <CardSkeletonLoading v-for="n in 6" :key="n" />
     </div>
-    <div
-      class="md:gap-4 flex flex-wrap w-[100%] "
-      v-else
-    >
+    <div class="md:gap-4 flex flex-wrap w-[100%]" v-else>
       <AlbumCard v-for="album in popularAlbums" :key="album.id" :album="album" />
     </div>
   </section>
@@ -128,10 +117,9 @@ const getPopularAlbums = async () => {
 
 @media (max-width: 678px) {
   .section-header {
-    margin-bottom:0px;
+    margin-bottom: 0px;
   }
 }
-
 
 .section-header h2 {
   font-size: 24px;
@@ -201,7 +189,6 @@ const getPopularAlbums = async () => {
   display: none;
   /* Safari & Chrome */
 }
-
 
 @media (max-width: 768px) {
   .section-header {

@@ -1,5 +1,5 @@
 <template>
-  <div class="liked-songs-page">
+  <div class="liked-songs-page min-h-[150vh]">
     <!-- Header -->
     <div class="liked-songs-header">
       <div class="header-content">
@@ -17,13 +17,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Controls -->
-    <!-- <div class="playlist-controls">
-      <button class="play-button" @click="playAll" :disabled="liked.length === 0">▶</button>
-      <button class="shuffle-button">🔀</button>
-      <button class="more-button">⋮</button>
-    </div> -->
 
     <!-- Songs Table -->
     <div class="songs-table">
@@ -111,7 +104,9 @@ import { auth } from '@/firebase.js'
 import { saveUserProfile } from '@/services/userService'
 import { likeSong, unlikeSong, getLikedSongs } from '@/services/musicService'
 import router from '@/router'
-
+defineProps({
+  class: String,
+})
 const liked = ref([])
 const loading = ref(true)
 const userRef = ref(null)
@@ -177,7 +172,6 @@ function playSong(song) {
 <style scoped>
 /* Page Layout */
 .liked-songs-page {
-  min-height: 100vh;
   background: linear-gradient(180deg, #242424 0%, #000 100%);
   color: white;
   font-family: 'Poppins', 'Helvetica Neue', Arial, sans-serif;

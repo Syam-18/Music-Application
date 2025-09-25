@@ -90,7 +90,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { auth } from '@/firebase' // ✅ import the instance, not from 'firebase/auth'
+import { auth } from '@/firebase'
 import { updateProfile, onAuthStateChanged } from 'firebase/auth'
 import { getAlbums } from '@/services/musicService'
 import { saveUserProfile } from '@/services/userService'
@@ -98,7 +98,9 @@ import { saveUserProfile } from '@/services/userService'
 const router = useRouter()
 const fallbackImage = 'https://via.placeholder.com/300x300?text=No+Image'
 
-// Profile state
+// ----------------------
+// PROFILE STATE
+// ----------------------
 const user = ref({
   name: 'User Name',
   avatar: fallbackImage,
@@ -106,10 +108,30 @@ const user = ref({
   following: 0,
 })
 
-// Editable Name
 const editingName = ref(false)
 const editableName = ref(user.value.name)
 
+const likedAlbums = ref([])
+const loading = ref(true)
+
+// ----------------------
+// LOCALSTORAGE LOAD
+// ----------------------
+const cachedName = localStorage.getItem('userName')
+const cachedAvatar = localStorage.getItem('userAvatar')
+
+if (cachedName) {
+  user.value.name = cachedName
+  editableName.value = cachedName
+}
+
+if (cachedAvatar) {
+  user.value.avatar = cachedAvatar
+}
+
+// ----------------------
+// NAME EDITING
+// ----------------------
 const startEditing = () => {
   editableName.value = user.value.name
   editingName.value = true
@@ -118,13 +140,17 @@ const startEditing = () => {
 const saveName = async () => {
   if (!editableName.value.trim() || !auth.currentUser) return
 
-  // Optimistic UI
-  user.value.name = editableName.value.trim()
+  const newName = editableName.value.trim()
+  user.value.name = newName
+  editableName.value = newName
   editingName.value = false
+
+  // Save locally
+  localStorage.setItem('userName', newName)
 
   try {
     // Update Firebase Auth
-    await updateProfile(auth.currentUser, { displayName: editableName.value.trim() })
+    await updateProfile(auth.currentUser, { displayName: newName })
     // Save to Firestore
     await saveUserProfile(auth.currentUser)
   } catch (err) {
@@ -132,7 +158,9 @@ const saveName = async () => {
   }
 }
 
-// Editable Avatar
+// ----------------------
+// AVATAR UPLOAD
+// ----------------------
 const fileInput = ref(null)
 const triggerFileInput = () => fileInput.value.click()
 
@@ -150,6 +178,7 @@ const saveAvatar = async (file) => {
     await saveUserProfile(auth.currentUser)
 
     user.value.avatar = url
+    localStorage.setItem('userAvatar', url)
   } catch (err) {
     console.error('Failed to save avatar:', err)
   }
@@ -170,9 +199,9 @@ const updateAvatar = (event) => {
   saveAvatar(file)
 }
 
-// Liked Albums (same as before)
-const likedAlbums = ref([])
-const loading = ref(true)
+// ----------------------
+// Liked Albums
+// ----------------------
 const getArtistNames = (artists) => artists?.map((a) => a.name).join(', ') || 'Unknown'
 
 const CLIENT_ID = '138c665e559f48ecb1bfe23378edfff9'
@@ -184,18 +213,16 @@ const getAccessToken = async () => {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      client_id: '138c665e559f48ecb1bfe23378edfff9',
-      client_secret: '193754eb82e0496ab5236eec396c12b5',
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
       grant_type: 'client_credentials',
     }),
   }
 
   const response = await fetch(url, options)
   const data = await response.json()
-
   localStorage.setItem('accessToken', data.access_token)
   localStorage.setItem('tokenExpiry', Date.now() + data.expires_in * 1000)
-
   return data.access_token
 }
 
@@ -207,6 +234,7 @@ const loadLikedAlbums = async () => {
       likedAlbums.value = []
       return
     }
+
     const token = await getAccessToken()
     const responses = await Promise.all(
       albumIds.map((id) =>
@@ -215,6 +243,7 @@ const loadLikedAlbums = async () => {
         }).then((res) => res.json()),
       ),
     )
+
     likedAlbums.value = responses.filter((a) => a && a.id)
   } catch (err) {
     console.error(err)
@@ -222,19 +251,31 @@ const loadLikedAlbums = async () => {
     loading.value = false
   }
 }
+
+// ----------------------
+// FIREBASE AUTH SYNC
+// ----------------------
 onMounted(() => {
   onAuthStateChanged(auth, async (currentUser) => {
-    if (currentUser) {
-      // Update local profile
-      user.value.name = currentUser.displayName || 'User Name'
-      user.value.avatar = currentUser.photoURL || fallbackImage
-
-      // Now safe to fetch albums
-      await loadLikedAlbums()
-    } else {
+    if (!currentUser) {
       likedAlbums.value = []
       loading.value = false
+      return
     }
+
+    // Update name/avatar if not in localStorage
+    if (!cachedName && currentUser.displayName) {
+      user.value.name = currentUser.displayName
+      editableName.value = currentUser.displayName
+      localStorage.setItem('userName', currentUser.displayName)
+    }
+
+    if (!cachedAvatar && currentUser.photoURL) {
+      user.value.avatar = currentUser.photoURL
+      localStorage.setItem('userAvatar', currentUser.photoURL)
+    }
+
+    await loadLikedAlbums()
   })
 })
 </script>

@@ -69,7 +69,7 @@
               class="genre-card"
               style="background: linear-gradient(135deg, #ba5d07 0%, #6d1919 100%)"
             >
-              <span>Country</span>
+              <span>Counry</span>
             </div>
             <div
               class="genre-card"

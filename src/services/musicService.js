@@ -1,14 +1,24 @@
 // services/musicService.js
-import { doc, setDoc, arrayUnion, getDoc, collection, getDocs } from 'firebase/firestore'
+import { doc, setDoc, arrayUnion, getDoc } from 'firebase/firestore'
 import { db, auth } from '@/firebase.js'
+import { onAuthStateChanged } from 'firebase/auth'
 
 // -------------------------------
 // Like a song (store full song object)
 // -------------------------------
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    const songs = await getLikedSongs()
+    console.log('Fetched liked songs:', songs)
+  } else {
+    console.log('No user logged in')
+  }
+})
+
 export async function likeSong(song) {
   const user = auth.currentUser
-  if (!user) throw new Error('No authenticated user found')
-
+  if (!user) return // No authenticated user found
   const userRef = doc(db, 'users', user.uid)
 
   // Save full song object instead of just ID
@@ -20,7 +30,7 @@ export async function likeSong(song) {
 // -------------------------------
 export async function unlikeSong(song) {
   const user = auth.currentUser
-  if (!user) throw new Error('No authenticated user found')
+  if (!user) return // No authenticated user found
 
   const userRef = doc(db, 'users', user.uid)
   const snap = await getDoc(userRef)
@@ -37,7 +47,7 @@ export async function unlikeSong(song) {
 // -------------------------------
 export async function getLikedSongs() {
   const user = auth.currentUser
-  if (!user) throw new Error('No authenticated user found')
+  if (!user) return []
 
   const userRef = doc(db, 'users', user.uid)
   const snap = await getDoc(userRef)

@@ -90,6 +90,9 @@ const getPopularArtists = async () => {
     <div class="section-header">
       <h2>Favourite Artists</h2>
     </div>
+    <div>
+      <p v-if="!popularArtists.length" class="text-gray-400">No artists found.</p>
+    </div>
     <div v-if="isArtistsLoading" class="md:gap-4 flex flex-wrap flex-row w-[100%]">
       <CardSkeletonLoading v-for="n in 6" :key="n" />
     </div>

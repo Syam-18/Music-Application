@@ -73,37 +73,88 @@ const password = ref('')
 const rememberMe = ref(false)
 const mode = ref('login')
 const errorMessage = ref('') // 🔹 add error state
+const loading = ref(false) // 🔹 optional loading state
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const handleSubmit = async () => {
-  errorMessage.value = '' // reset error before new attempt
+  errorMessage.value = ''
+  loading.value = true
 
   try {
+    const emailInput = email.value?.trim() || ''
+    const passwordInput = password.value?.trim() || ''
+    const nameInput = name.value?.trim() || ''
+
+    // Basic validation before hitting Firebase
+    if (!emailInput) {
+      errorMessage.value = 'Email is required.'
+      return
+    }
+    if (!passwordInput) {
+      errorMessage.value = 'Password is required.'
+      return
+    }
+
     if (mode.value === 'login') {
-      await authStore.login(email.value, password.value)
+      await authStore.login(emailInput, passwordInput)
       router.replace('/')
     } else {
-      await authStore.signup(email.value, password.value, name.value)
-      await authStore.login(email.value, password.value)
+      if (!nameInput) {
+        errorMessage.value = 'Name is required for signup.'
+        return
+      }
+      await authStore.signup(emailInput, passwordInput, nameInput)
+      await authStore.login(emailInput, passwordInput)
       router.replace('/')
     }
   } catch (err) {
-    // 🔹 Catch login/signup errors
+    // 🔹 Always log full error for debugging
     console.error('Auth error:', err)
 
-    if (mode.value === 'login') {
-      if (err.code === 'auth/user-not-found') {
+    // 🔹 Map Firebase error codes to user-friendly messages
+    switch (err.code) {
+      // Common login & signup errors
+      case 'auth/invalid-email':
+        errorMessage.value = 'Please enter a valid email address.'
+        break
+      case 'auth/missing-email':
+        errorMessage.value = 'Email is required.'
+        break
+      case 'auth/missing-password':
+        errorMessage.value = 'Password is required.'
+        break
+      case 'auth/wrong-password':
+        errorMessage.value = 'Incorrect password. Please try again.'
+        break
+      case 'auth/user-not-found':
         errorMessage.value = 'No account found with this email.'
-      } else if (err.code === 'auth/wrong-password') {
-        errorMessage.value = 'Incorrect password.'
-      } else {
-        errorMessage.value = 'Login failed. Please try again.'
-      }
-    } else {
-      errorMessage.value = 'Signup failed. Please try again.'
+        break
+      case 'auth/user-disabled':
+        errorMessage.value = 'This account has been disabled.'
+        break
+      case 'auth/too-many-requests':
+        errorMessage.value = 'Too many attempts. Please wait a few minutes before trying again.'
+        break
+
+      // Signup-specific
+      case 'auth/email-already-in-use':
+        errorMessage.value = 'This email is already registered.'
+        break
+      case 'auth/weak-password':
+        errorMessage.value = 'Password should be at least 6 characters long.'
+        break
+      case 'auth/operation-not-allowed':
+        errorMessage.value = 'Signup is disabled for this project. Please contact support.'
+        break
+
+      // Default fallback
+      default:
+        errorMessage.value = 'Something went wrong. Please try again.'
     }
+  } finally {
+    loading.value = false
   }
 }
 

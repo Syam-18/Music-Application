@@ -1,17 +1,25 @@
 <template>
-    <div class="album-card w-[100px] md:w-[180px] shrink-0 h-[100%]" @click="router.push(`/album/${album.id}`)">
-      <div class="card-image">
-        <img :src="album.images[0]?.url" :alt="album.name" />
-      </div>
-      <div class="card-content">
-        <h3 class="card-title text-sm md:text-[18px] truncate">{{ album.name }}</h3>
-        <div class="flex truncate gap-2" >
-          <p class="card-description text-xs tracking-wider" v-for="artist in album.artists" @click.stop="router.push(`/artist/${artist.id}`)">
-          {{ artist.name}}
+  <div
+    class="album-card w-[100px] md:w-[180px] shrink-0 h-[100%]"
+    @click="router.push(`/album/${album.id}`)"
+  >
+    <div class="card-image">
+      <img :src="album.images[0]?.url" :alt="album.name" />
+    </div>
+    <div class="card-content">
+      <h3 class="card-title text-sm md:text-[18px] truncate">{{ album.name }}</h3>
+      <div class="flex truncate gap-2">
+        <p
+          class="card-description text-xs tracking-wider"
+          v-for="artist in album.artists"
+          @click.stop="router.push(`/artist/${artist.id}`)"
+          :key="artist.id"
+        >
+          {{ artist.name }}
         </p>
-        </div>
       </div>
     </div>
+  </div>
 </template>
 
 <script setup>

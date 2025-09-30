@@ -74,7 +74,8 @@
       <button v-else class="login-btn" @click="$router.push('/login')">LogOut</button>
 
       <div v-if="showUserMenu" class="user-menu items-end">
-        <div class="user-menu-item" @click="logout">Logout</div>
+        <div class="user-menu-item" v-if="authStore.user != null" @click="logout">Logout</div>
+        <div class="user-menu-item" v-else @click="login">Logout</div>
       </div>
       <div class="user-controls ml-4">
         <button class="control-btn" @click="$router.push('/profile')">
@@ -89,12 +90,14 @@
 import { computed, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { store } from '@/stores'
+import { useAuthStore } from '@/stores/auth'
 
 const showUserMenu = ref(false)
 const route = useRoute()
 const router = useRouter()
 const searchQuery = ref(route.params.id ?? '')
 const tracks = ref([])
+const authStore = useAuthStore()
 
 // Watch for typing changes
 watch(searchQuery, (newValue) => {
@@ -193,6 +196,11 @@ const getTracks = async (query) => {
 
 const logout = () => {
   store.logout()
+  showUserMenu.value = false
+  router.push('/login')
+}
+const login = () => {
+  store.login()
   showUserMenu.value = false
   router.push('/login')
 }

@@ -90,9 +90,13 @@ const getPopularAlbums = async () => {
     <div class="section-header">
       <h2>Saved Albums</h2>
     </div>
+    <div>
+      <p v-if="!popularAlbums.length" class="text-gray-400">No albums found.</p>
+    </div>
     <div v-if="isAlbumsLoading" class="md:gap-4 flex flex-wrap flex-row w-[100%]">
       <CardSkeletonLoading v-for="n in 6" :key="n" />
     </div>
+
     <div class="md:gap-4 flex flex-wrap w-[100%]" v-else>
       <AlbumCard v-for="album in popularAlbums" :key="album.id" :album="album" />
     </div>
